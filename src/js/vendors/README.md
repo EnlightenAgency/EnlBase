@@ -1,4 +1,4 @@
 #JavaScript
-#Vendors
+##Vendors
 
-A `/vendors` folder is suggested for scripts from third party vendors.
+A `vendors` folder is suggested for scripts from third party vendors.
