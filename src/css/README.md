@@ -8,7 +8,6 @@ File Structure:
       |-fonts
       |-sass
           |-base
-          |-fonts
           |-pages
           |-partials
           |-ui-components
