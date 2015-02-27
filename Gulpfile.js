@@ -15,7 +15,7 @@ var plugins = require("gulp-load-plugins")({
 
 */
 
-var sass = require('gulp-ruby-sass'); // Ruby Sass (LibSass could be faster, but less compatible)
+var sass = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 
@@ -46,7 +46,7 @@ var livereload = require('gulp-livereload');
 	npm install gulp-util --save-dev
 	npm install del --save-dev
 
-	npm install gulp-ruby-sass --save-dev
+	npm install gulp-sass --save-dev   // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  "npm install gulp-ruby-sass" for Ruby Sass
 	npm install gulp-sourcemaps --save-dev
 	npm install gulp-autoprefixer --save-dev
 
@@ -65,14 +65,28 @@ var livereload = require('gulp-livereload');
 	npm install gulp-livereload --save-dev
 
 	To install all of the above at one time, run the following line at the command prompt:
-		npm install gulp gulp-util del gulp-ruby-sass gulp-sourcemaps gulp-autoprefixer gulp-concat gulp-uglify gulp-jshint map-stream gulp-imagemin imagemin-optipng imagemin-pngquant imagemin-mozjpeg imagemin-svgo gulp-webserver gulp-livereload --save-dev
+		npm install gulp gulp-util del gulp-sass gulp-sourcemaps gulp-autoprefixer gulp-concat gulp-uglify gulp-jshint map-stream gulp-imagemin imagemin-optipng imagemin-pngquant imagemin-mozjpeg imagemin-svgo gulp-webserver gulp-livereload --save-dev
 */
 
+// Configuration and environment variables
+
+// use "gulp --prod" to trigger production/build mode from commandline
+var isProduction = false;
+var sassStyle = 'expanded';
+var sourceMap = true;
+var doClean = gutil.env.clean;
+
+// use "gulp --prod" to trigger production/build mode from commandline
+if (gutil.env.prod) {
+	isProduction = true;
+	sassStyle = 'compressed';
+	sourceMap = false;
+}
 
 // File reference variables
 var basePaths = {
     src: 'src/',
-    dest: 'dist/'
+    dest: 'src/'  // current recommendation is to compile files to the same folder
 };
 
 var paths = {
@@ -89,7 +103,7 @@ var paths = {
         dest: basePaths.dest + 'js/'
     },
     styles: {
-        src: basePaths.src + 'css/' + 'scss/',
+        src: basePaths.src + 'css/' + 'sass/',   // sass is refernce for the type of preprocessor, we use the SCSS file format in Sass
         dest: basePaths.dest + 'css/'
     }
 };
@@ -108,17 +122,38 @@ var appFiles = {
 //	 	paths.scripts.src + 'main.js'
 //	]
 
-// use "gulp --prod" to trigger production/build mode from commandline
-var isProduction = false;
-var sassStyle = 'expanded';
-var sourceMap = true;
+// Want to create per page scripts that can all use a single task?
+// Iterate over the following object
+// var pageScripts = {
+// 	 	'section1': [
+// 			paths.scripts.src + 'vendor/pluginFile.js',
+// 	 		paths.scripts.src + 'vendor/aFramework.js', 
+// 	 		paths.scripts.src + 'section/section1SpecificCode.js'
+// 		],
+// 	 	'section2': [
+// 			paths.scripts.src + 'vendor/diffPluginFile.js',
+// 	 		paths.scripts.src + 'vendor/secondPluginFile.js', 
+// 	 		paths.scripts.src + 'section/section2SpecificCode.js'
+// 		],
+// 	};
 
-// use "gulp --prod" to trigger production/build mode from commandline
-if(gutil.env.prod) {
-	isProduction = true;
-	sassStyle = 'compressed';
-	sourceMap = false;
-}
+//Task Function (needs to be tested)
+
+// function processPageScripts() {
+// 	for (var script in pageScripts) {
+// 		gulp
+// 			.src(pageScripts[script])
+// 			//.pipe(lintjs())
+// 			.pipe(isProduction ? gutil.noop : sourcemaps.init())
+// 			.pipe(concat(script + '.js', {newLine: ';\r\n'})).on('error', standardHandler)
+// 			.pipe(isProduction ? gutil.noop : uglify()).on('error', standardHandler)
+// 			.pipe(isProduction ? gutil.noop : sourcemaps.write())
+// 			.pipe(gulp.dest(paths.scripts.dest + script + '.js'));
+// 	}
+// }
+// gulp.task('processpagescripts', processPageScripts);
+
+// END Configuration
 
 // Standard error handler
 function standardHandler(err){
@@ -129,22 +164,20 @@ function standardHandler(err){
 
 // Clean
 function cleancss(cb) {
-	del('dist/css', cb);
+	if (doClean) { del('dist/css', cb); }
 }
 
 function cleanjs(cb) {
-	del('dist/js', cb);
+	if (doClean) { del('dist/js', cb); }
 }
 
 function cleanimg(cb) {
-	del('dist/images', cb);
+	if (doClean) { del('dist/images', cb); }
 }
 
 function cleanhtml(cb) {
-	del(paths.html.dest + '**/*.html', cb);
+	if (doClean) { del(paths.html.dest + '**/*.html', cb); }
 }
-
-
 
 // CSS / Sass compilation
 function styles(cb) {
