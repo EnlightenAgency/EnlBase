@@ -32,8 +32,8 @@ The Enlighten Base Project is a sample or starter project for proof of concept a
 
  Install required Gulp Plugins:
 
-		The "--save-dev" flag will automatically add it to your package.json.  If the files 
-		already exist there, you don't need that flag, and can just run "npm install"
+	The "--save-dev" flag will automatically add it to your package.json.  
+	If the files already exist there, you don't need that flag, and can just run "npm install"
 
 	To install the above plugins at the command prompt:
 
