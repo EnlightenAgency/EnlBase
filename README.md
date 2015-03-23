@@ -39,7 +39,9 @@ The Enlighten Base Project is a sample or starter project for proof of concept a
 
 	npm install gulp --save-dev
 	npm install gulp-util --save-dev
-	npm install del --save-dev
+	npm install gulp-webserver --save-dev
+	npm install gulp-livereload --save-dev
+	npm install filesize --save-dev
 
 	npm install gulp-sass --save-dev   // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  "npm install gulp-ruby-sass" for Ruby Sass
 	npm install gulp-sourcemaps --save-dev
@@ -51,14 +53,12 @@ The Enlighten Base Project is a sample or starter project for proof of concept a
 	npm install map-stream --save-dev
 
 	npm install gulp-imagemin --save-dev
+		npm install imagemin-gifsicle --save-dev
 		npm install imagemin-optipng --save-dev
 		npm install imagemin-pngquant --save-dev
 		npm install imagemin-mozjpeg --save-dev
 		npm install imagemin-svgo --save-dev
 
-	npm install gulp-webserver --save-dev
-	npm install gulp-livereload --save-dev
-
 	To install all of the above at one time, run the following line at the command prompt:
-		npm install gulp gulp-util del gulp-sass gulp-sourcemaps gulp-autoprefixer gulp-concat gulp-uglify gulp-jshint map-stream gulp-imagemin imagemin-optipng imagemin-pngquant imagemin-mozjpeg imagemin-svgo gulp-webserver gulp-livereload --save-dev
+		npm install gulp gulp-util gulp-webserver gulp-livereload filesize gulp-sass gulp-sourcemaps gulp-autoprefixer gulp-concat gulp-uglify gulp-jshint map-stream gulp-imagemin imagemin-gifsicle imagemin-optipng imagemin-pngquant imagemin-mozjpeg imagemin-svgo --save-dev
 

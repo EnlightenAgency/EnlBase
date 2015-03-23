@@ -1,10 +1,20 @@
+(function() {
+    var childProcess = require("child_process");
+    oldSpawn = childProcess.spawn;
+    function mySpawn() {
+        console.log('spawn called');
+        console.log(arguments);
+        var result = oldSpawn.apply(this, arguments);
+        return result;
+    }
+    childProcess.spawn = mySpawn;
+})();
 // Requires & plugins
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var webserver = require('gulp-webserver');
 var livereload = require('gulp-livereload');
 var filesize = require('gulp-filesize');
-var debug = require('gulp-debug');
 
 // Styles
 var sass = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
@@ -20,6 +30,7 @@ var map = require('map-stream');
 // Images
 var imagemin = require('gulp-imagemin');
 	// imagemin plugins
+	var gifsicle = require('imagemin-gifsicle');
 	var optipng = require('imagemin-optipng');
 	var pngquant = require('imagemin-pngquant');
 	var mozjpeg = require('imagemin-mozjpeg');
@@ -31,6 +42,7 @@ var imagemin = require('gulp-imagemin');
 var isProduction = false;
 var sassStyle = 'expanded';
 var sourceMap = true;
+var showErrorStack = gutil.env.stacktrace;
 
 if (gutil.env.prod) {
 	isProduction = true;
@@ -40,34 +52,35 @@ if (gutil.env.prod) {
 
 // File reference variables
 var basePaths = {
-    src: 'src/',
-    dest: 'src/'  // current recommendation is to compile files to the same folder
+	src: 'src/',
+	dest: 'src/'  // current recommendation is to compile files to the same folder
 };
 
 var paths = {
-    html: {
-        src: basePaths.src,
-        dest: basePaths.dest
-    },
-    images: {
-        src: basePaths.src + 'images/',
-        dest: basePaths.dest + 'images/'
-    },
-    scripts: {
-        src: basePaths.src + 'js/',
-        dest: basePaths.dest + 'js/'
-    },
-    styles: {
-        src: basePaths.src + 'css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
-        dest: basePaths.dest + 'css/'
-    }
+	html: {
+		src: basePaths.src,
+		dest: basePaths.dest
+	},
+	images: {
+		src: basePaths.src + 'images/',
+		dest: basePaths.dest
+	},
+	scripts: {
+		src: basePaths.src + 'js/',
+		dest: basePaths.dest + 'js/'
+	},
+	styles: {
+		src: basePaths.src + 'css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
+		dest: basePaths.dest + 'css/'
+	}
 };
 
 var appFiles = {
 	html: paths.html.src +  '**/*.html',
-	images: paths.html.src +  '**/*.{png,jpg,jpeg,gif,svg}',
-    styles: paths.styles.src + '**/*.scss',
-    scriptFile: 'enlBase.js'
+	images: paths.html.src +  '**/*.{jpg,jpeg,gif,svg}', //png fails on Windows 8.1 right now
+	imagesPng: paths.html.src + '**/*.png',
+	styles: paths.styles.src + '**/*.scss',
+	scriptFile: 'enlBase.js'
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
 appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
@@ -80,7 +93,10 @@ appFiles.allScripts = [paths.scripts.src + 'vendors/**/*.js', paths.scripts.src 
 function errorHandler(err){
 	gutil.beep();
 	// Log to console
-	gutil.log(gutil.colors.red('Error: '), err.message);
+	gutil.log(gutil.colors.red('Error: '), err.message, ' - ', err.fileName);
+	if (showErrorStack) {
+		gutil.log(err.stack);
+	}
 }
 
 // CSS / Sass compilation
@@ -99,27 +115,27 @@ function styles(cb) {
 
 // JavaScript tasks and compilation
 function lintjs(cb) {
-    var myReporter = map(lintReporter);
-    function lintReporter(file, cb) {
-        if (!file.jshint.success) {
-        	var numErrors = file.jshint.results.length;
-            gutil.log(gutil.colors.bgRed('JSHint Error' + (numErrors > 1 ? '(s)' : '') + ': (' + numErrors + ')'));
-            file.jshint.results.forEach(function (err) {
-		    	if (err) {
-		    		gutil.log(' - ' + file.path + ': ' + err.error.line + ':' + err.error.character + ' - ' + err.error.reason);
-		    	}
-		    });
-        }
-        if (typeof cb === 'function') cb(null, file);
-    }
+	var myReporter = map(lintReporter);
+	function lintReporter(file, cb) {
+		if (!file.jshint.success) {
+			var numErrors = file.jshint.results.length;
+			gutil.log(gutil.colors.bgRed('JSHint Error' + (numErrors > 1 ? '(s)' : '') + ': (' + numErrors + ')'));
+			file.jshint.results.forEach(function (err) {
+				if (err) {
+					gutil.log(' - ' + file.path + ': ' + err.error.line + ':' + err.error.character + ' - ' + err.error.reason);
+				}
+			});
+		}
+		if (typeof cb === 'function') cb(null, file);
+	}
 
-    gulp
-    	.src(appFiles.userScripts) // don't lint `/vendor` scripts
-        .pipe(jshint())
-        //.pipe(jshint.reporter('default'))
-        .pipe(myReporter);
+	gulp
+		.src(appFiles.userScripts) // don't lint `/vendor` scripts
+		.pipe(jshint())
+		//.pipe(jshint.reporter('default'))
+		.pipe(myReporter);
 
-    if (typeof cb === 'function') cb();
+	if (typeof cb === 'function') cb();
 }
 
 function scripts(cb) {
@@ -128,8 +144,8 @@ function scripts(cb) {
 	gulp
 		.src(appFiles.allScripts)
 		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
-		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'}))
-		.pipe(isProduction ? uglify() : gutil.noop())
+		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
+		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
 		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
@@ -141,20 +157,37 @@ function scripts(cb) {
 // More info: http://www.devworkflows.com/posts/adding-image-optimization-to-your-gulp-workflow/
 function compressImages(cb) {
 	gulp
-    	.src(appFiles.images)
-        .pipe(imagemin({
-            progressive: true,
-            svgoPlugins: [{removeViewBox: false}],
-            use: [
-            	pngquant({quality: '65-80', speed: 4}),
-            	optipng({optimizationLevel: 3}),
-            	mozjpeg({quality: '70'}),
-            	svgo()
-            ]
-        }))
-        .pipe(gulp.dest(paths.images.dest));
+		.src(appFiles.images)
+		.pipe(imagemin({
+			progressive: true,
+			svgoPlugins: [{removeViewBox: false}],
+			use: [
+				gifsicle({interlaced: true}),
+				optipng({optimizationLevel: 3}),
+				pngquant({quality: '65-80', speed: 4}),
+				mozjpeg({quality: '70'}),
+				svgo()
+			]
+		})).on('error', errorHandler)
+		.pipe(gulp.dest(paths.images.dest));
 
-    if (typeof cb === 'function') cb();
+	if (typeof cb === 'function') cb();
+}
+
+// This does not currently work (tested on Windows 8.1)
+function compressPngImages(cb) {
+	gulp
+		.src(appFiles.imagesPng)
+		.pipe(imagemin({
+			progressive: true,
+			use: [
+				optipng({optimizationLevel: 3}),
+				pngquant({quality: '65-80', speed: 4})
+			]
+		})).on('error', errorHandler)
+		.pipe(gulp.dest(paths.images.dest));
+
+	if (typeof cb === 'function') cb();
 }
 
 // Webserver and watch
@@ -189,7 +222,7 @@ function watchAndReload(cb) {
 }
 
 /*********************
-    Task(s)
+	Task(s)
 *********************/
 
 // Style Task(s)
@@ -200,6 +233,7 @@ gulp.task('scripts', scripts);
 
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
+gulp.task('imagemin:png', compressPngImages);
 
 // Webserver/Watch Task(s)
 gulp.task('watch', watchAndReload);
