@@ -32,6 +32,7 @@ The Enlighten Base Project is a sample or starter project for proof of concept a
 
  Install required Gulp Plugins:
 
+```
     The "--save-dev" flag will automatically add it to your package.json.  
     If the files already exist there, you don't need that flag, and can just run "npm install"
 
@@ -61,3 +62,4 @@ The Enlighten Base Project is a sample or starter project for proof of concept a
 
     To install all of the above at one time, run the following line at the command prompt:
         npm install gulp gulp-util gulp-webserver gulp-livereload filesize gulp-sass gulp-sourcemaps gulp-autoprefixer gulp-concat gulp-uglify gulp-jshint map-stream gulp-imagemin imagemin-gifsicle imagemin-optipng imagemin-pngquant imagemin-mozjpeg imagemin-svgo --save-dev
+```
