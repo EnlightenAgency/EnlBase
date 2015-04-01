@@ -1,19 +1,8 @@
-(function() {
-    var childProcess = require("child_process");
-    oldSpawn = childProcess.spawn;
-    function mySpawn() {
-        console.log('spawn called');
-        console.log(arguments);
-        var result = oldSpawn.apply(this, arguments);
-        return result;
-    }
-    childProcess.spawn = mySpawn;
-})();
 // Requires & plugins
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var webserver = require('gulp-webserver');
-var livereload = require('gulp-livereload');
+var webserver = require('gulp-webserver'); // optional if needed for viewing locally
+var livereload = require('gulp-livereload'); // livereload browser plugin is also required for this to work
 var filesize = require('gulp-filesize');
 
 // Styles
@@ -132,7 +121,6 @@ function lintjs(cb) {
 	gulp
 		.src(appFiles.userScripts) // don't lint `/vendor` scripts
 		.pipe(jshint())
-		//.pipe(jshint.reporter('default'))
 		.pipe(myReporter);
 
 	if (typeof cb === 'function') cb();
@@ -145,6 +133,7 @@ function scripts(cb) {
 		.src(appFiles.allScripts)
 		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
+		.pipe(isProduction ? filesize() : gutil.noop())
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
 		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
 		.pipe(gulp.dest(paths.scripts.dest))
@@ -207,6 +196,7 @@ function webserver(cb) {
 function watchAndReload(cb) {
 	if (isProduction) { return; }
 
+	// remove this if you do not need webserver to view files locally
 	webserver(cb);
 
 	// Create LiveReload server
