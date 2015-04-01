@@ -1,7 +1,7 @@
 // Requires & plugins
 var gulp = require('gulp');
 var gutil = require('gulp-util');
-var webserver = require('gulp-webserver'); // optional if needed for viewing locally
+var webserver = require('gulp-webserver'); // optional - use for POC or if a webserver is needed for serving project files (i.e. template only)
 var livereload = require('gulp-livereload'); // livereload browser plugin is also required for this to work
 var filesize = require('gulp-filesize');
 
@@ -75,7 +75,6 @@ var appFiles = {
 appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
 appFiles.allScripts = [paths.scripts.src + 'vendors/**/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
 
-
 // END Configuration
 
 // Standard error handler
@@ -89,9 +88,8 @@ function errorHandler(err){
 }
 
 // CSS / Sass compilation
-function styles(cb) {
-	gulp
-		.src(appFiles.styles)
+function styles() {
+	var  stream = gulp.src(appFiles.styles)
 		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
 		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
@@ -99,12 +97,14 @@ function styles(cb) {
 		.pipe(gulp.dest(paths.styles.dest))
 		.pipe(filesize());
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
 // JavaScript tasks and compilation
-function lintjs(cb) {
-	var myReporter = map(lintReporter);
+function lintjs(scriptsToLint) {
+
+	// Create a custom reporter to show Lint Errors nicely formatted
+	var customReporter = map(lintReporter);
 	function lintReporter(file, cb) {
 		if (!file.jshint.success) {
 			var numErrors = file.jshint.results.length;
@@ -118,19 +118,18 @@ function lintjs(cb) {
 		if (typeof cb === 'function') cb(null, file);
 	}
 
-	gulp
-		.src(appFiles.userScripts) // don't lint `/vendor` scripts
+	var stream = gulp.src(scriptsToLint) 
 		.pipe(jshint())
-		.pipe(myReporter);
+		.pipe(customReporter);
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
-function scripts(cb) {
-	lintjs(); // runs lint, but doesn't prevent scripts task from continuing
+function scripts() {
+	// lint JavaScript files, but doesn't prevent scripts task from continuing
+	lintjs(appFiles.userScripts);  // don't lint `/vendor` scripts
 
-	gulp
-		.src(appFiles.allScripts)
+	var stream = gulp.src(appFiles.allScripts)
 		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
 		.pipe(isProduction ? filesize() : gutil.noop())
@@ -139,14 +138,13 @@ function scripts(cb) {
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
 // Image Minification and compression
 // More info: http://www.devworkflows.com/posts/adding-image-optimization-to-your-gulp-workflow/
-function compressImages(cb) {
-	gulp
-		.src(appFiles.images)
+function compressImages() {
+	var stream = gulp.src(appFiles.images)
 		.pipe(imagemin({
 			progressive: true,
 			svgoPlugins: [{removeViewBox: false}],
@@ -160,13 +158,14 @@ function compressImages(cb) {
 		})).on('error', errorHandler)
 		.pipe(gulp.dest(paths.images.dest));
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
-// This does not currently work (tested on Windows 8.1)
-function compressPngImages(cb) {
-	gulp
-		.src(appFiles.imagesPng)
+// TODO: This does not currently work (tested on Windows 8.1)
+// TODO: Check on a Mac
+// TODO: Figure out how to get PNG files working, recombine image compression tasks
+function compressPngImages() {
+	var stream = gulp.src(appFiles.imagesPng)
 		.pipe(imagemin({
 			progressive: true,
 			use: [
@@ -176,43 +175,52 @@ function compressPngImages(cb) {
 		})).on('error', errorHandler)
 		.pipe(gulp.dest(paths.images.dest));
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
 // Webserver and watch
-function webserver(cb) {
+function webserver() {
 	if (isProduction) { return; }
-	gulp
-		.src(basePaths.dest)
+	
+	var stream = gulp.src(basePaths.dest)
 		.pipe(webserver({
 			livereload: true,
 			directoryListing: true,
-			open: true
+			open: true,
+			port: 8000
 		}));
 
-	if (typeof cb === 'function') cb();
+	return stream;
 }
 
-function watchAndReload(cb) {
+function watchAndReload(done) {
 	if (isProduction) { return; }
 
-	// remove this if you do not need webserver to view files locally
-	webserver(cb);
+	// Remove this if you do not need webserver to view files locally
+	webserver();
 
 	// Create LiveReload server
 	livereload.listen();
 	
-	// Can't watch image files if writing back to the same directory, would create infinite loop
+	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
+	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done
 	// gulp.watch(appFiles.images, compressImages).on('change', livereload.changed);
 
 	gulp.watch(appFiles.styles, styles).on('change', livereload.changed);
 	gulp.watch([appFiles.allScripts, '!' + paths.scripts.src + appFiles.scriptFile], scripts).on('change', livereload.changed);
 
-	if (typeof cb === 'function') cb();
+	// return a callback function to signify the task has finished running (the watches will continue to run)
+	if (typeof done === 'function') { done(); }
 }
 
 /*********************
 	Task(s)
+
+	- Tasks all listed at the bottom for easy scanning, 
+	- Each task references the function that will be called
+	- Task functions should return a stream so Gulp can know when the task is finished
+	    More info: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
+
 *********************/
 
 // Style Task(s)
@@ -228,8 +236,11 @@ gulp.task('imagemin:png', compressPngImages);
 // Webserver/Watch Task(s)
 gulp.task('watch', watchAndReload);
 
-gulp.task('build', ['styles', 'scripts']);
 // Default task
 // by default it will run the dev process. 
 // Use "gulp --prod" to build for production
 gulp.task('default', ['styles', 'scripts', 'watch']);
+
+// Build task, skips the watch, 
+// same can be accomplished with gulp --prod
+gulp.task('build', ['styles', 'scripts']);
