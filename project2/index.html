@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<!-- Use conditional comments to add an ie and even oldIE class to the <html> tag to avoid 
+     using CSS hacks. Remove the lt IE 9 if IE8 or below support is not required. -->
+
+<!--[if lt IE 9]> <html class="ie oldIE" lang="en"> <![endif]-->
+<!--[if IE 9]> <html class="ie ie9" lang="en"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="en"><!--<![endif]-->
+
+<head>
+	<meta charset="utf-8" />
+    <title></title>
+    
+    <!-- For non-responsive sites (cue :sad_face: for fixed-width), remove the viewport meta tag so mobile devices will auto-scale the site -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+    <!-- Load CSS first so it isn't blocked by JavaScript. A single CSS file can be used for smaller projects, 
+         larger projects may split it up to reduce the initial load requirements. -->
+    <link href="css/site.css" rel="Stylesheet" type="text/css" media="all" />
+    
+    <!-- The shiv can be removed if IE8 support is not required or if using Modernizr -->
+    <!--[if lt IE 9]>
+        <script src="js/libs/html5shiv.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav></nav>
+        </header>
+        <section class="content"></section>
+        <footer></footer>
+    </div>
+
+    <!-- Load JavaScript at the bottom of the page for performance reasons. Most JavaScript files 
+         should be concatenated to the minimum number of files possible, often 1 or 2 (i.e. vendor 
+         files that rarely change and site files which change more frequently) -->
+    <script src="js/vendor.js"></script>
+    <script src="js/site.js"></script>
+</body>
+</html>
