@@ -1,8 +1,53 @@
-* {
-	margin: 0;
-	padding: 0;
-}
+/* modified version of:
+ *  normalize.css: http://necolas.github.com/normalize.css/
+ *  reset.css: http://meyerweb.com/eric/tools/css/reset/ 
+*/
 
-body {
-	margin: 10px;
-}
+/* HTML5 display definitions */
+article,aside,details,figcaption,figure,footer,header,hgroup,nav,section,summary { display: block;}
+audio,canvas,video {display: inline-block; *display: inline; *zoom: 1;}
+
+/* Base Reset */
+html { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; } /* used for mobile standard font sizing */
+html,button,input,select,textarea {font-family: sans-serif;}
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,cite,code,img,figure,sub,sup,
+dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{
+    margin:0; padding:0; border:0; outline:0; font-weight:inherit; font-style:inherit; font-size:100%; font-family:inherit; vertical-align:baseline;
+}   
+a:focus {outline: thin dotted; }
+a:hover, a:active { outline: 0; }
+h1,h2,h3,h4,h5,h6 {font-size: 1em;}
+ul, ol { list-style: none; list-style-image: none;}
+img { border: 0; -ms-interpolation-mode: bicubic; }
+svg:not(:root) {overflow: hidden;}
+button, input[type="button"], input[type="reset"], input[type="submit"] {cursor: pointer; -webkit-appearance: button; *overflow: visible; }
+button[disabled], input[disabled] { cursor: default;}
+input[type="checkbox"], input[type="radio"] { box-sizing: border-box;  padding: 0;  *height: 13px; *width: 13px; }
+input[type="search"] {-webkit-appearance: textfield; -moz-box-sizing: content-box; -webkit-box-sizing: content-box; box-sizing: content-box;}
+input[type="search"]::-webkit-search-decoration, input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
+textarea { overflow: auto; vertical-align: top; }
+table{border-collapse:collapse;border-spacing:0;}
+caption,th,td{text-align:left;font-weight:normal;}
+caption,th,td{text-align:left;font-weight:normal;}
+
+/* Basic Colors/Typography */
+body{background:#fff; color:#000; font:12px/14px arial, sans-serif;}
+
+/* Normalize Styles */
+abbr[title] {border-bottom: 1px dotted;}
+b,strong {font-weight: bold;}
+mark {background: #ff0;color: #000;}
+pre,code {font-family: monospace, serif;  font-size: 1em;}
+pre {white-space: pre;  white-space: pre-wrap;  word-wrap: break-word;}
+sub, sup {font-size: 75%; line-height: 0; position: relative; vertical-align: baseline;}
+sup {top: -0.5em;}
+sub {bottom: -0.25em;}
+
+/* Clearfix */
+.clearfix:before, .clearfix:after {content: " "; display: table;}
+.clearfix:after {clear: both;}
+.clearfix {*zoom: 1;} /* for IE 6/7 */
+
+/* Image Replacement */
+.ir {display: block; text-indent: 100%; overflow: hidden; white-space: nowrap; border: 0; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr;  *line-height:0;}
+.ir br {display: none;}
