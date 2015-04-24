@@ -97,3 +97,42 @@ function copyimg(cb) {
 gulp.task('copy:img', imagemin);
 gulp.task('copy:html', copyhtml);
 gulp.task('copy', ['copy:html', 'imagemin']);
+
+// External configuration for file paths
+// you can move all of the file path definitions out to a separate configuration file, that would have something like this:
+
+// FILE = pathConfig.js
+module.exports = {
+	basePaths = {
+		src: 'src/',
+		dest: 'src/'  // current recommendation is to compile files to the same folder
+	},
+	paths = {
+		html: {
+			src: basePaths.src,
+			dest: basePaths.dest
+		},
+		images: {
+			src: basePaths.src + 'images/',
+			dest: basePaths.dest
+		},
+		scripts: {
+			src: basePaths.src + 'js/',
+			dest: basePaths.dest + 'js/'
+		},
+		styles: {
+			src: basePaths.src + 'css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
+			dest: basePaths.dest + 'css/'
+		}
+	},
+	appFiles = {
+		html: paths.html.src +  '**/*.html',
+		images: paths.html.src +  '**/*.{jpg,jpeg,gif,svg}', //png fails on Windows 8.1 right now
+		imagesPng: paths.html.src + '**/*.png',
+		styles: paths.styles.src + '**/*.scss',
+		scriptFile: 'enlBase.js'
+	}
+};
+
+/* and in the Gulpfile */
+var paths = require('pathConfig');
