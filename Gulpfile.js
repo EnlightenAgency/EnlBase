@@ -1,3 +1,5 @@
+'use strict';
+
 // Requires & plugins
 var gulp = require('gulp');
 var gutil = require('gulp-util');
@@ -15,6 +17,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
 var map = require('map-stream');
+var merge = require('merge-stream');
 
 // Images
 var imagemin = require('gulp-imagemin');
@@ -69,10 +72,12 @@ var appFiles = {
 	images: paths.html.src +  '**/*.{jpg,jpeg,gif,svg}', //png fails on Windows 8.1 right now
 	imagesPng: paths.html.src + '**/*.png',
 	styles: paths.styles.src + '**/*.scss',
+	vendorScriptFile: 'vendors.js',
 	scriptFile: 'enlBase.js'
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
 appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
+appFiles.vendorScripts = [paths.scripts.src + 'vendors/**/*.js']; 
 appFiles.allScripts = [paths.scripts.src + 'vendors/**/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
 
 // END Configuration
@@ -115,7 +120,7 @@ function lintjs(scriptsToLint) {
 				}
 			});
 		}
-		if (typeof cb === 'function') cb(null, file);
+		if (typeof cb === 'function') { cb(null, file); }
 	}
 
 	var stream = gulp.src(scriptsToLint) 
@@ -126,10 +131,18 @@ function lintjs(scriptsToLint) {
 }
 
 function scripts() {
-	// lint JavaScript files, but doesn't prevent scripts task from continuing
+	// lint JavaScript files, but don't prevent scripts task from continuing
 	lintjs(appFiles.userScripts);  // don't lint `/vendor` scripts
 
-	var stream = gulp.src(appFiles.allScripts)
+	// don't generate map files for vendor files
+	var vendorStream = gulp.src(appFiles.vendorScripts)
+		.pipe(concat(appFiles.vendorScriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
+		.pipe(isProduction ? filesize() : gutil.noop())
+		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
+		.pipe(gulp.dest(paths.scripts.dest))
+		.pipe(filesize());
+
+	var userStream = gulp.src(appFiles.userScripts)
 		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
 		.pipe(isProduction ? filesize() : gutil.noop())
@@ -138,7 +151,9 @@ function scripts() {
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
 
-	return stream;
+	// See this link for recipe for multiple streams: 
+	// https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
+	return merge(vendorStream, userStream);
 }
 
 // Image Minification and compression
