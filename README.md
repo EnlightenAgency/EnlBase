@@ -1,10 +1,10 @@
-#Enl Base Project
+#Enl Front End Base Project
 
-The Enlighten Base Project is a sample or starter project for proof of concept and a reference guide for structuring projects at Enlighten.  It is not set in stone, as things change too fast, and a single base will not fit all projects.  
+The Enlighten Front End Base Project is a sample or starter project for proof of concept and a reference guide for structuring a project's front end code at Enlighten.  It is not set in stone, as things change too fast, and a single base will not fit all projects.  
 
-See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBase/wiki/Enlighten-Front-End-Standards) Wiki for more details.
+**See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBase/wiki/Enlighten-Front-End-Standards) Wiki for more details.**
 
-**Recommended File Structure:**
+###Recommended File Structure:
 
     |-Dist - distribution or build files, only generated code belongs in the dist folder
     |-Src - development files
@@ -14,7 +14,7 @@ See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBa
     |-Docs - documentation or information files
     |-Tests - unit tests
 
-**Files that belong in the root:**
+###Files that belong in the root:
 
  - `.git` (or other source control)
  - `.gitignore` (if using git)
@@ -22,13 +22,13 @@ See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBa
  - `package.json` - for Node dependencies and build tools
  - `Gulpfile.js (or Gruntfile.js)` - build tool files
 
-**Files that should not be source controlled:**
+###Files that should not be source controlled:
 
  - `/node_modules` - for Node dependencies and build tools
  - `/bower_components` - if using bower for client packages
  - `/dist` - the compiled version will likely not be source controlled unless using source control for deployment
 
-**Installation:**
+###Installation:
 
  - `npm install` to install the gulp packages via the `package.json` file
  - See the [Gulp Setup](https://github.com/EnlightenAgency/EnlBase/wiki/Gulp-Setup) for information on getting dependencies necessary for building the site.
