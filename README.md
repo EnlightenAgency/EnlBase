@@ -2,6 +2,8 @@
 
 The Enlighten Base Project is a sample or starter project for proof of concept and a reference guide for structuring projects at Enlighten.  It is not set in stone, as things change too fast, and a single base will not fit all projects.  
 
+See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBase/wiki/Enlighten-Front-End-Standards) Wiki for more details.
+
 **Recommended File Structure:**
 
     |-Dist - distribution or build files, only generated code belongs in the dist folder
