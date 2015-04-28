@@ -95,10 +95,10 @@ function errorHandler(err){
 // CSS / Sass compilation
 function styles() {
 	var  stream = gulp.src(appFiles.styles)
-		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
+		.pipe(sourcemaps.init())
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
 		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
-		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.styles.dest))
 		.pipe(filesize());
 
@@ -143,11 +143,11 @@ function scripts() {
 		.pipe(filesize());
 
 	var userStream = gulp.src(appFiles.userScripts)
-		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
+		.pipe(sourcemaps.init())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
 		.pipe(isProduction ? filesize() : gutil.noop())
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
-		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
 
