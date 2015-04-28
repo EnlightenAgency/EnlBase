@@ -213,16 +213,13 @@ function watchAndReload(done) {
 
 	// Remove this if you do not need webserver to view files locally
 	webserver();
-
-	// Create LiveReload server
-	livereload.listen();
 	
 	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
 	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done
 	// gulp.watch(appFiles.images, compressImages).on('change', livereload.changed);
 
-	gulp.watch(appFiles.styles, ['styles']).on('change', livereload.changed);
-	gulp.watch([appFiles.allScripts, '!' + paths.scripts.src + appFiles.scriptFile], ['scripts']).on('change', livereload.changed);
+	gulp.watch(appFiles.styles, ['styles']);
+	gulp.watch([appFiles.allScripts, '!' + paths.scripts.src + appFiles.scriptFile], ['scripts']);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
 	if (typeof done === 'function') { done(); }
