@@ -90,6 +90,7 @@ function errorHandler(err){
 	if (showErrorStack) {
 		gutil.log(err.stack);
 	}
+	this.emit('end');
 }
 
 // CSS / Sass compilation
