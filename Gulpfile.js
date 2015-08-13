@@ -1,32 +1,38 @@
 'use strict';
 
 // Requires & plugins
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var webserver = require('gulp-webserver'); // optional - use for POC or if a webserver is needed for serving project files (i.e. template only)
-var livereload = require('gulp-livereload'); // livereload browser plugin is also required for this to work
-var filesize = require('gulp-filesize');
+// 
+// ****************************************************************************************************
+//  Double check and update version numbers in the package.json file when setting 
+//  up a new project to ensure that the project is using up to date packages.
+// ****************************************************************************************************
+
+var gulp         = require('gulp');
+var gutil        = require('gulp-util');
+var webserver    = require('gulp-webserver'); // optional - use for POC or if a webserver is needed for serving project files (i.e. template only)
+var livereload   = require('gulp-livereload'); // livereload browser plugin is also required for this to work
+var filesize     = require('gulp-filesize');
 
 // Styles
-var sass = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
-var sourcemaps = require('gulp-sourcemaps');
+var sass         = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
+var sourcemaps   = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 
 // Scripts
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var jshint = require('gulp-jshint');
-var map = require('map-stream');
-var merge = require('merge-stream');
+var concat       = require('gulp-concat');
+var uglify       = require('gulp-uglify');
+var jshint       = require('gulp-jshint');
+var map          = require('map-stream');
+var merge        = require('merge-stream');
 
 // Images
-var imagemin = require('gulp-imagemin');
+var imagemin     = require('gulp-imagemin');
 	// imagemin plugins
 	var gifsicle = require('imagemin-gifsicle');
-	var optipng = require('imagemin-optipng');
+	var optipng  = require('imagemin-optipng');
 	var pngquant = require('imagemin-pngquant');
-	var mozjpeg = require('imagemin-mozjpeg');
-	var svgo = require('imagemin-svgo');
+	var mozjpeg  = require('imagemin-mozjpeg');
+	var svgo     = require('imagemin-svgo');
 
 // Configuration and environment variables
 
@@ -69,8 +75,7 @@ var paths = {
 
 var appFiles = {
 	html: paths.html.src +  '**/*.html',
-	images: paths.html.src +  '**/*.{jpg,jpeg,gif,svg}', //png fails on Windows 8.1 right now
-	imagesPng: paths.html.src + '**/*.png',
+	images: paths.html.src +  '**/*.{jpg,jpeg,png,gif,svg}',
 	styles: paths.styles.src + '**/*.scss',
 	vendorScriptFile: 'vendors.js',
 	scriptFile: 'enlBase.js'
@@ -195,23 +200,6 @@ function compressImages() {
 	return stream;
 }
 
-// TODO: This does not currently work (tested on Windows 8.1)
-// TODO: Check on a Mac
-// TODO: Figure out how to get PNG files working, recombine image compression tasks
-function compressPngImages() {
-	var stream = gulp.src(appFiles.imagesPng)
-		.pipe(imagemin({
-			progressive: true,
-			use: [
-				optipng({optimizationLevel: 3}),
-				pngquant({quality: '65-80', speed: 4})
-			]
-		})).on('error', errorHandler)
-		.pipe(gulp.dest(paths.images.dest));
-
-	return stream;
-}
-
 // Webserver and watch
 function startWebserver() {
 	if (isProduction) { return; }
@@ -266,7 +254,6 @@ gulp.task('scripts', scripts);
 
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
-gulp.task('imagemin:png', compressPngImages);
 
 // Webserver/Watch Task(s)
 gulp.task('watch', watchAndServer);
