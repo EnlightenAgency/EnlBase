@@ -106,21 +106,35 @@ function styles() {
 }
 
 // JavaScript tasks and compilation
-function lintjs(scriptsToLint) {
+function jslinter(scriptsToLint) {
 
 	// Create a custom reporter to show Lint Errors nicely formatted
 	var customReporter = map(lintReporter);
 	function lintReporter(file, cb) {
 		if (!file.jshint.success) {
 			var numErrors = file.jshint.results.length;
+			var errIndex = 1;
+			gutil.log('----------------------------------------');
 			gutil.log(gutil.colors.bgRed('JSHint Error' + (numErrors > 1 ? '(s)' : '') + ': (' + numErrors + ')'));
-			file.jshint.results.forEach(function (err) {
-				if (err) {
-					gutil.log(' - ' + file.path + ': ' + err.error.line + ':' + err.error.character + ' - ' + err.error.reason);
-				}
-			});
+			file.jshint.results.forEach(displayError);
+			gutil.log('----------------------------------------');
+			gutil.beep();
 		}
 		if (typeof cb === 'function') { cb(null, file); }
+
+		function displayError(err) {
+			var filepathparts = file.path.indexOf('/') > -1 ? file.path.split('/') : file.path.split('\\');
+			var filename = filepathparts.length > 1 ? 
+					'.../' + filepathparts[filepathparts.length - 2] + '/' + filepathparts[filepathparts.length - 1] : 
+					file.path;
+			if (err) {
+				gutil.log(' ' + errIndex + ') ' + 
+							gutil.colors.magenta(filename) + ': ' + 
+							gutil.colors.yellow(err.error.line + ':' + err.error.character) + ' - ' + 
+							gutil.colors.blue(err.error.reason));
+			}
+			errIndex++;
+		}
 	}
 
 	var stream = gulp.src(scriptsToLint) 
@@ -130,9 +144,13 @@ function lintjs(scriptsToLint) {
 	return stream;
 }
 
+function lintjs() {
+	jslinter(appFiles.userScripts); // don't lint `/vendor` scripts
+}
+
 function scripts() {
 	// lint JavaScript files, but don't prevent scripts task from continuing
-	lintjs(appFiles.userScripts);  // don't lint `/vendor` scripts
+	lintjs();
 
 	// don't generate map files for vendor files
 	var vendorStream = gulp.src(appFiles.vendorScripts)
@@ -194,7 +212,7 @@ function compressPngImages() {
 }
 
 // Webserver and watch
-function webserver() {
+function startWebserver() {
 	if (isProduction) { return; }
 	
 	var stream = gulp.src(basePaths.dest)
@@ -212,7 +230,7 @@ function watchAndReload(done) {
 	if (isProduction) { return; }
 
 	// Remove this if you do not need webserver to view files locally
-	webserver();
+	startWebserver();
 
 	// Create LiveReload server
 	livereload.listen();
@@ -222,7 +240,10 @@ function watchAndReload(done) {
 	// gulp.watch(appFiles.images, compressImages).on('change', livereload.changed);
 
 	gulp.watch(appFiles.styles, ['styles']).on('change', livereload.changed);
-	gulp.watch([appFiles.allScripts, '!' + paths.scripts.src + appFiles.scriptFile], ['scripts']).on('change', livereload.changed);
+	gulp.watch([appFiles.allScripts, 
+				'!' + paths.scripts.src + appFiles.scriptFile,
+				'!' + paths.scripts.src + appFiles.vendorScriptFile
+			   ], ['scripts']).on('change', livereload.changed);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
 	if (typeof done === 'function') { done(); }
@@ -242,6 +263,7 @@ function watchAndReload(done) {
 gulp.task('styles', styles);
 
 // Script Task(s)
+gulp.task('lintjs', lintjs);
 gulp.task('scripts', scripts);
 
 // Image Compression Task(s)
