@@ -90,15 +90,16 @@ function errorHandler(err){
 	if (showErrorStack) {
 		gutil.log(err.stack);
 	}
+	this.emit('end');
 }
 
 // CSS / Sass compilation
 function styles() {
 	var  stream = gulp.src(appFiles.styles)
-		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
+		.pipe(sourcemaps.init())
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
 		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
-		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.styles.dest))
 		.pipe(filesize());
 
@@ -161,11 +162,11 @@ function scripts() {
 		.pipe(filesize());
 
 	var userStream = gulp.src(appFiles.userScripts)
-		.pipe(isProduction ? sourcemaps.init() : gutil.noop())
+		.pipe(sourcemaps.init())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
 		.pipe(isProduction ? filesize() : gutil.noop())
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
-		.pipe(isProduction ? sourcemaps.write() : gutil.noop())
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
 
@@ -226,24 +227,21 @@ function startWebserver() {
 	return stream;
 }
 
-function watchAndReload(done) {
+function watchAndServer(done) {
 	if (isProduction) { return; }
 
 	// Remove this if you do not need webserver to view files locally
 	startWebserver();
-
-	// Create LiveReload server
-	livereload.listen();
 	
 	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
 	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done
-	// gulp.watch(appFiles.images, compressImages).on('change', livereload.changed);
+	// gulp.watch(appFiles.images, compressImages);
 
-	gulp.watch(appFiles.styles, ['styles']).on('change', livereload.changed);
+	gulp.watch(appFiles.styles, ['styles']);
 	gulp.watch([appFiles.allScripts, 
 				'!' + paths.scripts.src + appFiles.scriptFile,
 				'!' + paths.scripts.src + appFiles.vendorScriptFile
-			   ], ['scripts']).on('change', livereload.changed);
+			   ], ['scripts']);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
 	if (typeof done === 'function') { done(); }
@@ -271,7 +269,7 @@ gulp.task('imagemin', compressImages);
 gulp.task('imagemin:png', compressPngImages);
 
 // Webserver/Watch Task(s)
-gulp.task('watch', watchAndReload);
+gulp.task('watch', watchAndServer);
 
 // Default task
 // by default it will run the dev process. 
