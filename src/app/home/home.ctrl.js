@@ -5,9 +5,13 @@
         .module('app')
         .controller('HomeCtrl', HomeCtrl);
 
-    function HomeCtrl($scope, $rootScope,$timeout) {
+    HomeCtrl.$inject = ['$scope', '$rootScope', '$timeout'];
+
+     function HomeCtrl($scope, $rootScope, $timeout) {
         var homeVm = this;
         homeVm.bounds = new google.maps.LatLngBounds();
+        homeVm.loadPins = loadPins();
+        homeVm.myMarker = {};
         $rootScope.title = "Home";
 
         var defaultLatLng = new google.maps.LatLng(37.09024, -95.712891);
@@ -16,8 +20,6 @@
             suppressMarkers: true
         });
         var directionsService = new google.maps.DirectionsService();
-
-        var myMarker = {};
 
         homeVm.mapOptions = {
             zoom: 4,
@@ -29,8 +31,11 @@
             scaleControl: false,
             mapTypeControl: false
         };
+        init()
 
-        $timeout(loadPins, 200);
+        function init() {
+            $timeout(loadPins, 200);
+        }
 
         function loadPins() {
             if ($scope.map) {
@@ -44,7 +49,7 @@
 
         function _placeMyself() {
             var location = new google.maps.LatLng("42.240845", "-83.234097");
-            myMarker = new google.maps.Marker({
+            homeVm.myMarker = new google.maps.Marker({
                 position: location,
                 map: $scope.map,
                 title: "Damian Strong",
@@ -72,7 +77,7 @@
 
             directionsService.route({
                 origin:location,
-                destination: myMarker.position,
+                destination: homeVm.myMarker.position,
                 travelMode: google.maps.TravelMode.DRIVING
             }, function(result, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
@@ -82,7 +87,9 @@
                 }
             });            
         }
-    }
 
-    HomeCtrl.$inject = ['$scope', '$rootScope','$timeout'];
+        return {
+            loadPins: loadPins
+        };
+     }
 })();

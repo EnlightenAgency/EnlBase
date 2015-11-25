@@ -10,12 +10,16 @@
 
     <!--source files-->    
 	<script src="vendors.js"></script>
+	<script src="app/tests/jasmine-2.3.4/angular-mock.js"></script>
     <script src="enlBase.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?&libraries=drawing,places,weather,geometry&sensor=false&key=AIzaSyC6QZlY-0Rt4-wa9Xs36mEVWFgkJBkD33o"></script>
 
     <!-- include spec files here... -->
-    <script src="app/tests/ExampleTest.js"></script>
+    <script src="tests.js"></script>
   </head>
   <body>
+  <div id="MapRow" class="mapDiv columns medium-7">
+        <div id="map_canvas" class="map-container" ui-map="map" ui-options="homeVm.mapOptions"></div>     
+    </div>
   </body>
 </html>
