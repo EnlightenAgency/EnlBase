@@ -60,16 +60,16 @@ var paths = {
 		dest: basePaths.dest
 	},
 	images: {
-		src: basePaths.src + 'images/',
+		src: basePaths.src + 'lib/images/',
 		dest: basePaths.dest
 	},
 	scripts: {
-		src: basePaths.src + 'js/',
-		dest: basePaths.dest + 'js/'
+		src: basePaths.src,
+		dest: basePaths.dest 
 	},
 	styles: {
-		src: basePaths.src + 'css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
-		dest: basePaths.dest + 'css/'
+		src: basePaths.src + 'lib/css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
+		dest: basePaths.dest + 'lib/css/'
 	}
 };
 
@@ -81,9 +81,12 @@ var appFiles = {
 	scriptFile: 'enlBase.js'
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
-appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
-appFiles.vendorScripts = [paths.scripts.src + 'vendors/**/*.js']; 
-appFiles.allScripts = [paths.scripts.src + 'vendors/**/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
+appFiles.userScripts = [paths.scripts.src + 'app/**/*.js', '!' + paths.scripts.src + 'app/tests/**/*.js'];
+appFiles.vendorScripts = [paths.scripts.src + 'lib/js/vendor/jquery 2.1.4/jquery-2.1.4.js',paths.scripts.src + 'lib/js/vendor/angular/angular.js', paths.scripts.src + 'lib/js/vendor/**/*.js'];
+appFiles.allScripts = [
+    paths.scripts.src + 'lib/js/vendor/jquery 2.1.4/jquery-2.1.4.js', paths.scripts.src + 'lib/js/vendor/**/*.js',
+    paths.scripts.src + 'app/**/*.js',
+    '!' + paths.scripts.src + appFiles.scriptFile];
 
 // END Configuration
 
@@ -206,10 +209,9 @@ function startWebserver() {
 	
 	var stream = gulp.src(basePaths.dest)
 		.pipe(webserver({
-			livereload: true,
-			directoryListing: true,
 			open: true,
-			port: 8000
+			port: 8000,
+			fallback: 'index.html'
 		}));
 
 	return stream;
@@ -219,7 +221,7 @@ function watchAndServer(done) {
 	if (isProduction) { return; }
 
 	// Remove this if you do not need webserver to view files locally
-	startWebserver();
+	//startWebserver();
 	
 	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
 	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done

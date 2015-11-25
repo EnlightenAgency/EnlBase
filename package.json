@@ -1,10 +1,16 @@
 {
-  "name": "enl-base",
+  "name": "enlexample",
   "version": "0.0.1",
-  "description": "Example that can be used as a base for setting up projects",
-  "main": "Gulpfile.js",
-  "repository": "https://github.com/EnlightenAgency/EnlBase.git",
-  "dependencies": {},
+  "private": true,
+  "scripts": {
+    "start": "node ./routes/app.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.12.4",
+    "ejs": "^2.3.2",
+    "express": "~4.12.4",
+    "path": "^0.11.14"
+  },
   "devDependencies": {
     "gulp": "3.9.0",
     "gulp-autoprefixer": "2.3.1",
@@ -26,9 +32,6 @@
     "imagemin-svgo": "4.1.2",
     "map-stream": "0.0.6",
     "merge-stream": "0.1.8"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Enlighten",
   "license": "MIT"

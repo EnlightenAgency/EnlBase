@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html lang="en" ng-app="app" ng-controller="PageCtrl as page" ng-cloak>
+<head>
+    <meta charset="utf-8" />
+    <title>Damian Strong - {{title}}</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link href="lib/css/vendors/foundation.css" rel="Stylesheet" type="text/css" media="all" />
+    <link href="lib/css/core.css" rel="Stylesheet" type="text/css" media="all" />
+	<link href="http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" rel="stylesheet">
+</head>
+<body>
+	<header class="header columns small-12" ng-include="'app/header/header.html'" ></header>
+	<div class="side-nav columns small-4 medium-2" ng-include="'app/side-nav/sidenav.html'"></div>      			
+	<div class="layout-view columns small-8 medium-10" ui-view autoscroll="true"></div>
+    <footer class="footer columns small-12" ng-include="'app/footer/footer.html'"></footer>
+    <route-loading></route-loading>
+    <script src="vendors.js"></script>
+    <script src="enlBase.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?&libraries=drawing,places,weather,geometry&key=AIzaSyC6QZlY-0Rt4-wa9Xs36mEVWFgkJBkD33o"></script>
+</body>
+</html>

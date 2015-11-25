@@ -1,0 +1,41 @@
+﻿.header {
+    background: #4CAF50 no-repeat;
+    height: 5em;
+    display: flex;
+    flex-flow: row;
+    padding: 0 1em;
+
+    nav {
+        padding-top: 1em;
+    }
+
+    li {
+        display: inline-block;
+        border-right: 1px solid #333;
+        text-align: center;
+
+        a {
+            color: #FFF;
+            font-size: 1.5em;
+        }
+
+        &.last {
+            border-right: none;
+        }
+    }
+
+    .noMP {
+        margin: 0;
+        padding: 0;
+    }
+
+    .logo-icon {
+        font-size: 4em;
+    }
+
+    .logo-text {
+        font-size: 1.25em;
+        line-height: 1em;
+        padding-top: 0.3em;
+    }
+}
