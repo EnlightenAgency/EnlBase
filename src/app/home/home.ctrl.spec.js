@@ -22,7 +22,6 @@
 
             it("Plots my pin and users pin", function () {
                 spyOn(homeVm, "loadPins")
-                console.log(homeVm);
                 homeVm.loadPins();               
                 expect(homeVm.loadPins).toHaveBeenCalled();
             })

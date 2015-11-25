@@ -31,7 +31,15 @@
             scaleControl: false,
             mapTypeControl: false
         };
-        init()
+
+        google.maps.event.addDomListener(window, 'load', init);
+        google.maps.event.addDomListener(window, "resize", function () {
+            var center = $scope.map.getCenter();
+            google.maps.event.trigger($scope.map, "resize");
+            $scope.map.setCenter(center);
+        });
+
+        init();
 
         function init() {
             $timeout(loadPins, 200);
