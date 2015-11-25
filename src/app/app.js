@@ -7,7 +7,7 @@
             'ngAnimate',
             'mm.foundation',
             'ui.event',
-            'ui.map'         
+            'ui.map'
         ])
     .config(config)
     .run(run);
@@ -18,35 +18,40 @@
 
     }
     function config($urlProvider, $locationProvider, $stateProvider) {
-        $urlProvider.otherwise('/');
+        $urlProvider.when('', '/');     
 
         $locationProvider.html5Mode(true).hashPrefix('!');
 
         $stateProvider
         .state('home', {
-            url: "/",
-            templateUrl: "app/home/home.view.html",
+            url: '/',
+            templateUrl: 'app/home/home.view.html',
             controller: 'HomeCtrl',
             controllerAs: 'homeVm'
         })
         .state('about', {
-            url: "/about",
-            templateUrl: "app/about/about.view.html",
+            url: '/about',
+            templateUrl: 'app/about/about.view.html',
             controller: 'AboutCtrl',
             controllerAs: 'aboutVm'
         })
         .state('contact', {
-            url: "/contact",
-            templateUrl: "app/contact/contact.view.html",
+            url: '/contact',
+            templateUrl: 'app/contact/contact.view.html',
             controller: 'ContactCtrl',
             controllerAs: 'contactVm'
         })
         .state('portfolio', {
-            url: "/portfolio",
-            templateUrl: "app/portfolio/portfolio.view.html",
+            url: '/portfolio',
+            templateUrl: 'app/portfolio/portfolio.view.html',
             controller: 'PortfolioCtrl',
             controllerAs: 'portfolioVm'
+        })
+        .state('404', {
+            url: '/404',
+            templateUrl: 'app/404/404.view.html'
         });
+        $urlProvider.otherwise('/');
     }
 
 })();
