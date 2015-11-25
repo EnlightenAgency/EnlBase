@@ -16,12 +16,15 @@
 
         a {
             color: #FFF;
-            font-size: 1.5em;
         }
 
         &.last {
             border-right: none;
         }
+    }
+
+    a {
+        color: #FFF;
     }
 
     .noMP {
