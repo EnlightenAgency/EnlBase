@@ -15,11 +15,11 @@
         $rootScope.title = "Home";
 
         var defaultLatLng = new google.maps.LatLng(37.09024, -95.712891);
-        var trafficLayer = new google.maps.TrafficLayer();
         var directionsDisplay = new google.maps.DirectionsRenderer({
             suppressMarkers: true
         });
         var directionsService = new google.maps.DirectionsService();
+        var trafficLayer = new google.maps.TrafficLayer();
 
         homeVm.mapOptions = {
             zoom: 4,
@@ -32,7 +32,6 @@
             mapTypeControl: false
         };
 
-        google.maps.event.addDomListener(window, 'load', init);
         google.maps.event.addDomListener(window, "resize", function () {
             var center = $scope.map.getCenter();
             google.maps.event.trigger($scope.map, "resize");

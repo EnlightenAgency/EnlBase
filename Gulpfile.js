@@ -70,7 +70,11 @@ var paths = {
     styles: {
         src: basePaths.src + 'lib/css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
         dest: basePaths.dest + 'lib/css/'
-    }
+    },
+	e2e:{
+		src:'tests/',
+		dest:'tests/'
+	}
 };
 
 var appFiles = {
@@ -79,16 +83,19 @@ var appFiles = {
     styles: paths.styles.src + '**/*.scss',
     vendorScriptFile: 'vendors.js',
     scriptFile: 'enlBase.js',
-    testFile: "tests.js"
+    testFile: "tests.js",
+	e2eTestFile: "e2e.js"
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
 appFiles.userScripts = [paths.scripts.src + 'app/**/*.js', '!' + paths.scripts.src + 'app/**/*.spec.js', '!' + paths.scripts.src + 'app/tests/**/*.js'];
-appFiles.testScripts = [paths.scripts.src + 'app/**/*.spec.js'];
+appFiles.testScripts = [paths.scripts.src + 'app/**/*.spec.js' ];
+appFiles.e2eScripts = [paths.e2e.src + 'e2e/*.spec.js'];
 appFiles.vendorScripts = [paths.scripts.src + 'lib/js/vendor/jquery 2.1.4/jquery-2.1.4.js', paths.scripts.src + 'lib/js/vendor/angular/angular.js', paths.scripts.src + 'lib/js/vendor/**/*.js'];
 appFiles.allScripts = [
     paths.scripts.src + 'lib/js/vendor/jquery 2.1.4/jquery-2.1.4.js', paths.scripts.src + 'lib/js/vendor/**/*.js',
     paths.scripts.src + 'app/**/*.js',
     paths.scripts.src + 'app/**/*.spec.js',
+	paths.e2e.src + 'e2e/*.spec.js',
     '!' + paths.scripts.src + appFiles.scriptFile
 ];
 
@@ -189,6 +196,14 @@ function scripts() {
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.scripts.dest))
+		.pipe(filesize());
+	var e2eStream = gulp.src(appFiles.e2eScripts)
+		.pipe(sourcemaps.init())
+		.pipe(concat(appFiles.e2eTestFile, { newLine: ';\r\n' })).on('error', errorHandler)
+		.pipe(isProduction ? filesize() : gutil.noop())
+		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest(paths.e2e.dest))
 		.pipe(filesize());
 
     // See this link for recipe for multiple streams: 
