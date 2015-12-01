@@ -197,6 +197,7 @@ function scripts() {
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest(paths.scripts.dest))
 		.pipe(filesize());
+		
 	var e2eStream = gulp.src(appFiles.e2eScripts)
 		.pipe(sourcemaps.init())
 		.pipe(concat(appFiles.e2eTestFile, { newLine: ';\r\n' })).on('error', errorHandler)

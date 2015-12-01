@@ -13,10 +13,6 @@
             var scope, homeVm;
             beforeEach(inject(function ($controller, $rootScope) {
                 scope = $rootScope.$new();
-                scope.map = new google.maps.Map(document.getElementById('map_canvas'), {
-                    center: { lat: -34.397, lng: 150.644 },
-                    zoom: 8
-                });
                 homeVm = $controller('HomeCtrl as homeVm', { $scope: scope });
             }));
 
