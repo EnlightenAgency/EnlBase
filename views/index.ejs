@@ -13,8 +13,10 @@
 </head>
 <body>
 	<header class="header columns small-12" ng-include="'app/header/header.html'" ></header>
-	<div class="side-nav columns small-4 medium-2" ng-include="'app/side-nav/sidenav.html'"></div>      			
-	<div class="layout-view columns small-8 medium-10" ui-view autoscroll="true"></div>
+	<div class="layout-view columns small-12 noMP">
+		<div class="side-nav columns small-4 medium-2" ng-include="'app/side-nav/sidenav.html'"></div>      			
+		<div class="columns small-8 medium-10" ui-view autoscroll="true"></div>
+	</div>
     <footer class="footer columns small-12" ng-include="'app/footer/footer.html'"></footer>
     <route-loading></route-loading>
     <script src="vendors.js"></script>
