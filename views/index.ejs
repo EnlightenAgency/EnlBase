@@ -13,7 +13,7 @@
 </head>
 <body>
 	<header class="header columns small-12" ng-include="'app/header/header.html'" ></header>
-	<div class="layout-view columns small-12 noMP">
+	<div class="layout-view columns small-12 noMP" ng-controller="MoveCtrl as move">
 		<div class="side-nav columns small-4 medium-2" ng-include="'app/side-nav/sidenav.html'"></div>      			
 		<div class="columns small-8 medium-10" ui-view autoscroll="false"></div>
 	</div>
