@@ -9,12 +9,9 @@
 
 	function MoveCtrl($scope, $rootScope, $timeout) {
 		var moveable = this;
-		var dot = {
-			alive: false,
-			pos: _dotPos
-		}
+		moveable.dotNum = 0;
 		moveable.score = 0;
-		moveable.dot = dot;
+		moveable.dots = [];
 		$(window).keydown(_key);
 
 		function _key(e) {
@@ -40,6 +37,7 @@
 
 			function _move(direction) {
 				var speed = 16;
+				var maxDots = 3;
 				var size = $('.moveable').height();
 				var character = $('.moveable');
 				//get current position
@@ -80,18 +78,22 @@
 						break;
 				}
 				//spawn dot on first move
-				_spawnDot();
-				_checkCollision();
+				if (moveable.dots.length < maxDots) {
+					_spawnDot();
+				}
+				for (var i = 0; i < moveable.dots.length; i++) {
+					_checkCollision(moveable.dots[i]);
+				}
 			}
 		}
 
-		function _checkCollision() {
-			var dbds = _getBounds(".dot");
+		function _checkCollision(dot) {
+			var dbds = _getBounds(dot.id);
 			var cbds = _getBounds(".moveable");
 			//check for collision with dot
-			var cols = collide(dbds, cbds)
+			var cols = collide(dbds, cbds);
 			if (cols) {
-				_killDot()
+				_killDot(dot);
 			}
 		}
 
@@ -100,39 +102,47 @@
 		a.top < b.top + b.height && a.top + a.height > b.top);
 		}
 		function _spawnDot() {
-			//if not visible make visible and choose random starting spot
-			if (!moveable.dot.alive) {
-				moveable.dot.alive = true;
-				$scope.$digest();
-				var newDot = $(".dot");
-				var topR = Math.random() * (window.innerHeight - newDot.height())
-				var leftR = Math.random() * (window.innerHeight - newDot.height() - 20)
-				newDot.offset({ top: topR, left: leftR })
-			}
+			var dot = {
+				alive: true,
+				pos: _dotPos,
+				id: ".dot" + moveable.dotNum
+			};
+			//add new dot to array
+			moveable.dots.push(dot);			
+			$(".dots").append('<div class="dot dot' + moveable.dotNum + '" ng-show="dot.alive"></div>');
+			moveable.dotNum++;
+			//populate id of dot for reference
+			$scope.$digest();
+			//set new dots position
+			var newDot = $(dot.id);
+			var topR = Math.abs(Math.random() * (window.innerHeight - newDot.height()));
+			var leftR = Math.abs(Math.random() * (window.innerHeight - newDot.height() - 20));
+			newDot.offset({ top: topR, left: leftR });
 
 		}
-		function _killDot() {
-			console.log("Collides!")
+		function _killDot(dot) {
 			//increase score and kill dot
 			moveable.score++;
-			moveable.dot.alive = false;
+			dot.alive = false;
+			var index = moveable.dots.indexOf(dot);
+			moveable.dots.splice(index, 1);
+			$(dot.id).remove();
 			$scope.$digest();
 		}
 
-		function _dotPos() {
-			return $('.dot').offset();
+		function _dotPos(dot) {
+			return $(dot.id).offset();
 		}
 		function _getBounds(obj) {
 			//return bounds of dot
-			var bounds = {
+			return {
 				left: $(obj).offset().left,
 				right: $(obj).offset().left + $(obj).width(),
 				top: $(obj).offset().top,
 				bottom: $(obj).offset().top + $(obj).height(),
 				width: $(obj).width(),
 				height: $(obj).height()
-			}
-			return bounds;
+			};
 		}
 
 	}
