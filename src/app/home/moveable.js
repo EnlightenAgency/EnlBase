@@ -89,18 +89,18 @@
 			var dbds = _getBounds(".dot");
 			var cbds = _getBounds(".moveable");
 			//check for collision with dot
-			var cols = doBoxesIntersect(dbds, cbds)
+			var cols = collide(dbds, cbds)
 			if (cols) {
 				_killDot()
 			}
 		}
 
-		function doBoxesIntersect(a, b) {
-			return (Math.abs(a.left - b.left)  <= (a.width + b.width)/2) &&
-				   (Math.abs(a.top - b.top)  <= (a.height + b.height)/2);
+		function collide(a, b) {
+			return (a.left < b.left + b.width && a.left + a.width > b.left &&
+		a.top < b.top + b.height && a.top + a.height > b.top);
 		}
 		function _spawnDot() {
-			//if not visible make visisble and choose random starting spot
+			//if not visible make visible and choose random starting spot
 			if (!moveable.dot.alive) {
 				moveable.dot.alive = true;
 				$scope.$digest();
