@@ -1,0 +1,10 @@
+﻿<div class="game columns small-12" >
+	<!-- The canvas for the panning background -->
+	<canvas id="background" class="background" width="600" height="360">
+		Your browser does not support canvas. Please try again with a different browser.
+	</canvas>
+	<canvas id="main" class="main" width="600" height="360"></canvas>
+	<canvas id="ship" class="ship" width="600" height="360"></canvas>
+	<div class="score">SCORE: <span id="score"></span></div>
+	<div class="game-over" id="game-over">GAME OVER<p><span ng-click="gameVm.restart()">Restart</span></p></div>
+</div>

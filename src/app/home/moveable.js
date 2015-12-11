@@ -15,24 +15,26 @@
 		$(window).keydown(_key);
 
 		function _key(e) {
-			var event = window.event ? window.event : e;
-			switch (event.keyCode) {
-				case 37: //left
-					_move('l');
-					e.preventDefault();
-					break;
-				case 38: //up
-					_move('u');
-					e.preventDefault();
-					break;
-				case 39: //right
-					_move('r');
-					e.preventDefault();
-					break;
-				case 40: //down
-					_move('d');
-					e.preventDefault();
-					break;
+			if ($('.moveable').length) {
+				var event = window.event ? window.event : e;
+				switch (event.keyCode) {
+					case 37: //left
+						_move('l');
+						e.preventDefault();
+						break;
+					case 38: //up
+						_move('u');
+						e.preventDefault();
+						break;
+					case 39: //right
+						_move('r');
+						e.preventDefault();
+						break;
+					case 40: //down
+						_move('d');
+						e.preventDefault();
+						break;
+				}
 			}
 
 			function _move(direction) {
@@ -108,7 +110,7 @@
 				id: ".dot" + moveable.dotNum
 			};
 			//add new dot to array
-			moveable.dots.push(dot);			
+			moveable.dots.push(dot);
 			$(".dots").append('<div class="dot dot' + moveable.dotNum + '" ng-show="dot.alive"></div>');
 			moveable.dotNum++;
 			//populate id of dot for reference

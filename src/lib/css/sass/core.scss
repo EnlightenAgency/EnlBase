@@ -1,12 +1,13 @@
 ﻿@import "base/reset";
-@import "pages/home";
 @import "pages/about";
 @import "pages/contact";
+@import "pages/game";
+@import "pages/home";
 @import "pages/portfolio";
-@import "ui_components/header";
-@import "ui_components/sidenav";
 @import "ui_components/footer";
+@import "ui_components/header";
 @import "ui_components/move";
+@import "ui_components/sidenav";
 
 html, body {
 	height: 100%;
