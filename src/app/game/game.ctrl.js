@@ -122,7 +122,7 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 		game.quadTree.clear();
 		game.background.init(0, 0);
 		game.lives.lifeCount = 2;
-		game.lives.init(0, this.bgCanvas.height - ImageRepo.spaceship.height, ImageRepo.spaceship.width, ImageRepo.spaceship.height);
+		game.lives.init(0, game.bgCanvas.height - ImageRepo.spaceship.height, ImageRepo.spaceship.width, ImageRepo.spaceship.height);
 		game.ship.init(game.shipStartX, game.shipStartY,
 					   ImageRepo.spaceship.width, ImageRepo.spaceship.height);
 		game.enemyPool.init("enemy");

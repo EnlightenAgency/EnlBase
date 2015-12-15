@@ -36,11 +36,11 @@
 				}
 				else if (object == "enemyBullet") {
 					for (var k = 0; k < size; k++) {
-						var eBullet = new Bullet("enemyBullet");
-						eBullet.init(0, 0, ImageRepo.enemyBullet.width, ImageRepo.enemyBullet.height);
-						eBullet.collidableWith = "ship";
-						eBullet.type = "enemyBullet";
-						pool[k] = eBullet;
+						var bullet = new Bullet("enemyBullet");
+						bullet.init(0, 0, ImageRepo.enemyBullet.width, ImageRepo.enemyBullet.height);
+						bullet.collidableWith = "ship";
+						bullet.type = "enemyBullet";
+						pool[k] = bullet;
 					}
 				}
 			};

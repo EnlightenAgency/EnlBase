@@ -55,8 +55,8 @@
 					return false;
 				}
 				else {
-					game.playerScore += 10;
-					if (game.playerScore % 200 === 0) //every 2000 points gain a life
+					game.playerScore += 100;
+					if (game.playerScore % 2000 === 0) //every 2000 points gain a life
 					{
 						game.lives.lifeCount++;
 					}
