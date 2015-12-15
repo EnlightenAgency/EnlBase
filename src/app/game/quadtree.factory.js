@@ -40,8 +40,8 @@
 					this.nodes[i].getAllObjects(returnedObjects);
 				}
 
-				for (var i = 0, len = objects.length; i < len; i++) {
-					returnedObjects.push(objects[i]);
+				for (var j = 0, len = objects.length; j < len; j++) {
+					returnedObjects.push(objects[j]);
 				}
 
 				return returnedObjects;
@@ -87,11 +87,11 @@
 				}
 
 				if (this.nodes.length) {
-					var index = this.getIndex(obj);
+					var nodeIndex = this.getIndex(obj);
 					// Only add the object to a subnode if it can fit completely
 					// within one
-					if (index != -1) {
-						this.nodes[index].insert(obj);
+					if ( nodeIndex != -1) {
+						this.nodes[ nodeIndex].insert(obj);
 
 						return;
 					}
@@ -101,19 +101,19 @@
 
 				// Prevent infinite splitting
 				if (objects.length > maxObjects && level < maxLevels) {
-					if (this.nodes[0] == null) {
+					if (this.nodes[0] === null) {
 						this.split();
 					}
 
-					var i = 0;
-					while (i < objects.length) {
+					var k = 0;
+					while (k < objects.length) {
 
-						var index = this.getIndex(objects[i]);
+						var index = this.getIndex(objects[k]);
 						if (index != -1) {
-							this.nodes[index].insert((objects.splice(i, 1))[0]);
+							this.nodes[index].insert((objects.splice(k, 1))[0]);
 						}
 						else {
-							i++;
+							k++;
 						}
 					}
 				}

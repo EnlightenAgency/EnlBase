@@ -4,10 +4,10 @@
 	angular
 		.module('app')
 		.factory('Enemy', Enemy);
-	Enemy.$inject = ["Drawable",  "ImageRepo"]
+	Enemy.$inject = ["Drawable",  "ImageRepo"];
 	function Enemy(Drawable, ImageRepo) {
 		function enemy() {
-			var percentFire = .005;
+			var percentFire = 0.005;
 			var chance = 0;
 			this.alive = false;
 			this.collidableWith = "bullet";
@@ -56,6 +56,10 @@
 				}
 				else {
 					game.playerScore += 10;
+					if (game.playerScore % 200 === 0) //every 2000 points gain a life
+					{
+						game.lives.lifeCount++;
+					}
 					return true;
 				}
 			};
@@ -64,7 +68,7 @@
 			 */
 			this.fire = function () {
 				game.enemyBulletPool.get(this.x + this.width / 2, this.y + this.height, -2.5);
-			}
+			};
 			/*
 			 * Resets the enemy values
 			 */

@@ -10,7 +10,7 @@
 		* Custom Pool object. Holds Bullet objects to be managed to prevent
 		* garbage collection.
 		*/
-		function pool(maxSize) {
+		function pools(maxSize) {
 			var size = maxSize; // Max bullets allowed in the pool
 			var pool = [];
 			/*
@@ -28,31 +28,31 @@
 					}
 				}
 				else if (object == "enemy") {
-					for (var i = 0; i < size; i++) {
+					for (var j = 0; j < size; j++) {
 						var enemy = new Enemy();
 						enemy.init(0, 0, ImageRepo.enemy.width, ImageRepo.enemy.height);
-						pool[i] = enemy;
+						pool[j] = enemy;
 					}
 				}
 				else if (object == "enemyBullet") {
-					for (var i = 0; i < size; i++) {
-						var bullet = new Bullet("enemyBullet");
-						bullet.init(0, 0, ImageRepo.enemyBullet.width, ImageRepo.enemyBullet.height);
-						bullet.collidableWith = "ship";
-						bullet.type = "enemyBullet";
-						pool[i] = bullet;
+					for (var k = 0; k < size; k++) {
+						var eBullet = new Bullet("enemyBullet");
+						eBullet.init(0, 0, ImageRepo.enemyBullet.width, ImageRepo.enemyBullet.height);
+						eBullet.collidableWith = "ship";
+						eBullet.type = "enemyBullet";
+						pool[k] = eBullet;
 					}
 				}
 			};
 			this.getPool = function () {
 				var obj = [];
-				for (var i = 0; i < size; i++) {
-					if (pool[i].alive) {
-						obj.push(pool[i]);
+				for (var l = 0; l < size; l++) {
+					if (pool[l].alive) {
+						obj.push(pool[l]);
 					}
 				}
 				return obj;
-			}
+			};
 			/*
 			 * Grabs the last item in the list and initializes it and
 			 * pushes it to the front of the array.
@@ -82,6 +82,6 @@
 				}
 			};
 		}
-		return pool;
+		return pools;
 	}
 }());

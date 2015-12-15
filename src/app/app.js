@@ -19,7 +19,7 @@
 	}
 	function config($urlProvider, $locationProvider, $stateProvider, $urlMatcherFactoryProvider) {
 		$urlProvider.when('', '/');
-		$urlMatcherFactoryProvider.strictMode(false)
+		$urlMatcherFactoryProvider.strictMode(false);
 		$locationProvider.html5Mode(true).hashPrefix('!');
 
 		$stateProvider

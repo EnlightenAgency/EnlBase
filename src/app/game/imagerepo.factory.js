@@ -24,19 +24,19 @@
 		}
 		this.background.onload = function () {
 			imageLoaded();
-		}
+		};
 		this.spaceship.onload = function () {
 			imageLoaded();
-		}
+		};
 		this.bullet.onload = function () {
 			imageLoaded();
-		}
+		};
 		this.enemy.onload = function () {
 			imageLoaded();
-		}
+		};
 		this.enemyBullet.onload = function () {
 			imageLoaded();
-		}
+		};
 
 		// Set images src
 		this.background.src = "lib/images/bg.png";

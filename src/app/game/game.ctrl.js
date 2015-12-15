@@ -2,13 +2,15 @@
 	.module('app')
 	.controller('GameCtrl', GameCtrl);
 
-GameCtrl.$inject = ['$scope', '$rootScope', '$timeout', 'ImageRepo', 'Background', 'Ship', 'Bullet', 'Enemy', 'Pool', 'QuadTree'];
+GameCtrl.$inject = ['$scope', '$rootScope', '$timeout', 'ImageRepo', 'Background', 'Ship', 'Bullet',
+	'Enemy', 'Pool', 'QuadTree','Lives'];
 
 var game;
 
 var KEY_STATUS = {};
 
-function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bullet, Enemy, Pool, QuadTree) {
+function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bullet,
+	Enemy, Pool, QuadTree, Lives) {
 	var gameVm = this;
 	gameVm.gameOver = false;
 	gameVm.restart = restart;
@@ -40,6 +42,9 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 				Background.prototype.context = this.bgContext;
 				Background.prototype.canvasWidth = this.bgCanvas.width;
 				Background.prototype.canvasHeight = this.bgCanvas.height;
+				Lives.prototype.context = this.bgContext;
+				Lives.prototype.canvasWidth = this.bgCanvas.width;
+				Lives.prototype.canvasHeight = this.bgCanvas.height;
 				Ship.prototype.context = this.shipContext;
 				Ship.prototype.canvasWidth = this.shipCanvas.width;
 				Ship.prototype.canvasHeight = this.shipCanvas.height;
@@ -52,6 +57,12 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 				// Initialize the background object
 				this.background = new Background();
 				this.background.init(0, 0); // Set draw point to 0,0
+
+				//initialize lives
+				this.lives = new Lives();
+				this.lives.lifeCount = 2;
+				this.lives.init(0, this.bgCanvas.height - ImageRepo.spaceship.height, ImageRepo.spaceship.width, ImageRepo.spaceship.height);
+
 				// Initialize the ship object
 				this.ship = new Ship();
 
@@ -59,8 +70,8 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 				this.shipStartX = this.shipCanvas.width / 2 - ImageRepo.spaceship.width;
 				this.shipStartY = this.shipCanvas.height / 4 * 3 + ImageRepo.spaceship.height * 2;
 				this.ship.init(this.shipStartX, this.shipStartY,
-							   ImageRepo.spaceship.width, ImageRepo.spaceship.height);
-
+							   ImageRepo.spaceship.width, ImageRepo.spaceship.height);				
+				
 				// Initialize the enemy pool object
 				this.enemyPool = new Pool(30);
 				this.enemyPool.init("enemy");
@@ -90,12 +101,12 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 			for (var i = 1; i <= 18; i++) {
 				this.enemyPool.get(x, y, 2);
 				x += width + 25;
-				if (i % 6 == 0) {
+				if (i % 6 === 0) {
 					x = 100;
-					y += spacer
+					y += spacer;
 				}
 			}
-		}
+		};
 
 		this.gameOver = function () {
 			$('#game-over').css("display","block");
@@ -110,6 +121,8 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 		game.mainContext.clearRect(0, 0, game.mainCanvas.width, game.mainCanvas.height);
 		game.quadTree.clear();
 		game.background.init(0, 0);
+		game.lives.lifeCount = 2;
+		game.lives.init(0, this.bgCanvas.height - ImageRepo.spaceship.height, ImageRepo.spaceship.width, ImageRepo.spaceship.height);
 		game.ship.init(game.shipStartX, game.shipStartY,
 					   ImageRepo.spaceship.width, ImageRepo.spaceship.height);
 		game.enemyPool.init("enemy");
@@ -117,14 +130,14 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 		game.enemyBulletPool.init("enemyBullet");
 		game.playerScore = 0;
 		game.start();
-	};
+	}
 
 	KEY_CODES = {
 		32: 'space',
 		37: 'left',
 		39: 'right'
-	}
-	for (code in KEY_CODES) {
+	};
+	for (var code in KEY_CODES) {
 		KEY_STATUS[KEY_CODES[code]] = false;
 	}
 	document.onkeydown = function (e) {
@@ -135,14 +148,14 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 			e.preventDefault();
 			KEY_STATUS[KEY_CODES[keyCode]] = true;
 		}
-	}
+	};
 	document.onkeyup = function (e) {
 		var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 		if (KEY_CODES[keyCode]) {
 			e.preventDefault();
 			KEY_STATUS[KEY_CODES[keyCode]] = false;
 		}
-	}
+	};
 
 }
 
@@ -163,7 +176,7 @@ function detectCollision() {
 			}
 		}
 	}
-};
+}
 
 //constantly loops for game state
 function animate() {
@@ -188,6 +201,7 @@ function animate() {
 	game.ship.bulletPool.animate();
 	game.enemyPool.animate();
 	game.enemyBulletPool.animate();
+	game.lives.draw();
 	}
 }
 

@@ -4,7 +4,7 @@
 	angular
 		.module('app')
 		.factory('Ship', Ship);
-	Ship.$inject = ["Drawable", "Pool", "ImageRepo"]
+	Ship.$inject = ["Drawable", "Pool", "ImageRepo"];
 	function Ship(Drawable, Pool, ImageRepo) {
 		function ship() {
 			this.speed = 5;
@@ -16,7 +16,7 @@
 			this.type = "ship";
 
 			this.init = function (x, y, width, height) {
-				// Defualt variables
+				// Default variables
 				this.x = x;
 				this.y = y;
 				this.width = width;
@@ -24,9 +24,10 @@
 				this.alive = true;
 				this.isColliding = false;
 				this.bulletPool.init("bullet");
-			}
+			};
 
 			this.draw = function () {
+				// Finish by redrawing the ship
 				this.context.drawImage(ImageRepo.spaceship, this.x, this.y);
 			};
 			this.move = function () {
@@ -40,26 +41,31 @@
 					// redraw the ship. Change the else if's to if statements
 					// to have diagonal movement.
 					if (KEY_STATUS.left) {
-						this.x -= this.speed
+						this.x -= this.speed;
 						if (this.x <= 0) // Keep player within the screen
 							this.x = 0;
 					} else if (KEY_STATUS.right) {
-						this.x += this.speed
+						this.x += this.speed;
 						if (this.x >= this.canvasWidth - this.width)
 							this.x = this.canvasWidth - this.width;
 					}
-					// Finish by redrawing the ship
 					if (!this.isColliding) {
 						this.draw();
 					}
-					else {
-						this.alive = false;
-						game.gameOver();
-					}
+
 				}
 				if (KEY_STATUS.space && counter >= fireRate && !this.isColliding) {
 					this.fire();
 					counter = 0;
+				}
+
+				if (this.isColliding && game.lives.lifeCount > 0) {
+					game.lives.lifeCount -= 1;
+					this.isColliding = false;
+				}
+				else if (this.isColliding) {
+					this.alive = false;
+					game.gameOver();
 				}
 			};
 			/*
