@@ -28,6 +28,8 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 	function Game() {
 		this.init = function () {
 			this.playerScore = 0;
+			this.level = 1;
+			this.enemySpeed = .5;
 			this.bgCanvas = document.getElementById('background');
 			this.shipCanvas = document.getElementById('ship');
 			this.mainCanvas = document.getElementById('main');
@@ -73,12 +75,7 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 							   ImageRepo.spaceship.width, ImageRepo.spaceship.height);				
 				
 				// Initialize the enemy pool object
-				this.enemyPool = new Pool(30);
-				this.enemyPool.init("enemy");
 				this.spawnWave();
-
-				this.enemyBulletPool = new Pool(10);
-				this.enemyBulletPool.init("enemyBullet");
 
 				this.quadTree = new QuadTree({ x: 0, y: 0, width: this.mainCanvas.width, height: this.mainCanvas.height });
 				return true;
@@ -93,13 +90,30 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 		};
 
 		this.spawnWave = function () {
+
+			//every 3rd level spawn a boss instead!
+			if (this.enemyPool && this.enemyBulletPool) {
+				this.enemyPool.clear();
+				this.enemyBulletPool.clear();
+			}
+			var enemyCount = this.level * 6;
+			if (enemyCount > 30) //max out enemies at 30
+			{
+				enemyCount = 30;
+			}
+			this.enemyPool = new Pool(enemyCount);
+			this.enemyPool.init("enemy");
+
+			this.enemyBulletPool = new Pool(this.level * 10);
+			this.enemyBulletPool.init("enemyBullet");
+
 			var height = ImageRepo.enemy.height;
 			var width = ImageRepo.enemy.width;
 			var x = 100;
 			var y = -height;
 			var spacer = y * 1.5;
-			for (var i = 1; i <= 18; i++) {
-				this.enemyPool.get(x, y, 2);
+			for (var i = 1; i <= this.enemyPool.size; i++) {
+				this.enemyPool.get(x, y,this.level * this.enemySpeed);
 				x += width + 25;
 				if (i % 6 === 0) {
 					x = 100;
@@ -116,6 +130,9 @@ function GameCtrl($scope, $rootScope, $timeout, ImageRepo, Background, Ship, Bul
 
 	function restart() {
 		$('#game-over').css("display", "none");
+
+		game.level = 1;
+
 		game.bgContext.clearRect(0, 0, game.bgCanvas.width, game.bgCanvas.height);
 		game.shipContext.clearRect(0, 0, game.shipCanvas.width, game.shipCanvas.height);
 		game.mainContext.clearRect(0, 0, game.mainCanvas.width, game.mainCanvas.height);
@@ -191,6 +208,7 @@ function animate() {
 	detectCollision();
 	// No more enemies
 	if (game.enemyPool.getPool().length === 0) {
+		game.level++;
 		game.spawnWave();
 	}
 	// Animate game objects

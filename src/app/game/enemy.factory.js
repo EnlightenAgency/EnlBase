@@ -7,7 +7,7 @@
 	Enemy.$inject = ["Drawable",  "ImageRepo"];
 	function Enemy(Drawable, ImageRepo) {
 		function enemy() {
-			var percentFire = 0.005;
+			var percentFire = 0.001;
 			var chance = 0;
 			this.alive = false;
 			this.collidableWith = "bullet";
@@ -15,7 +15,7 @@
 			/*
 			 * Sets the Enemy values
 			 */
-			this.spawn = function (x, y, speed) {
+			this.spawn = function (x, y, speed,size) {
 				this.x = x;
 				this.y = y;
 				this.speed = speed;
@@ -24,7 +24,7 @@
 				this.alive = true;
 				this.leftEdge = this.x - 90;
 				this.rightEdge = this.x + 90;
-				this.bottomEdge = this.y + 140;
+				this.bottomEdge = this.y + 50 * (size / 6);
 			};
 			/*
 			 * Move the enemy
@@ -33,14 +33,14 @@
 				this.context.clearRect(this.x - 1, this.y, this.width + 1, this.height);
 				this.x += this.speedX;
 				this.y += this.speedY;
-				if (this.x <= this.leftEdge) {
-					this.speedX = this.speed;
+				if (this.x <= this.leftEdge || this.x >= this.rightEdge + this.width) {
+					//change direction
+					this.speedX = -this.speedX;
+					
 				}
-				else if (this.x >= this.rightEdge + this.width) {
-					this.speedX = -this.speed;
-				}
+				//fly down from top and strafe
 				else if (this.y >= this.bottomEdge) {
-					this.speed = 1.5;
+					this.speed = game.level *game.enemySpeed;
 					this.speedY = 0;
 					this.y -= 5;
 					this.speedX = -this.speed;
