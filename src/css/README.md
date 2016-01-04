@@ -6,7 +6,7 @@ File Structure:
 
     css
       |-fonts
-      |-sass
+      |-scss
           |-base
           |-pages
           |-partials

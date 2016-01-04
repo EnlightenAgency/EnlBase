@@ -1,4 +1,4 @@
-#CSS / Sass
+#CSS / Scss
 ##Base
 
 Sass files for global styles, icons, reset/normalize. Global styles include things like:

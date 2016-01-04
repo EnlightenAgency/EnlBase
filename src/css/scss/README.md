@@ -1,5 +1,5 @@
 #CSS
-##Sass
+##Scss
 
 This folder should contain all of the Sass files for the site.  They are broken down as follows:
 
