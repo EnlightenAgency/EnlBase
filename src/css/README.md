@@ -10,5 +10,5 @@ File Structure:
           |-base
           |-pages
           |-partials
-          |-ui-components
+          |-modules
           |-vendors
