@@ -21,6 +21,7 @@ The Enlighten Front End Base Project is a sample or starter project for proof of
  - `README.md` - project notes, setup instructions, changelog
  - `package.json` - for Node dependencies and build tools
  - `Gulpfile.js (or Gruntfile.js)` - build tool files
+ - `.eslintrc` (for eslint rules - if using eslint)
 
 ###Files that should not be source controlled:
 

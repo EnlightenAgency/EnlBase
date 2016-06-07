@@ -21,7 +21,7 @@ var autoprefixer = require('gulp-autoprefixer');
 // Scripts
 var concat       = require('gulp-concat');
 var uglify       = require('gulp-uglify');
-var jshint       = require('gulp-jshint');
+var eslint       = require('gulp-eslint');
 var map          = require('map-stream');
 var merge        = require('merge-stream');
 
@@ -120,12 +120,12 @@ function jslinter(scriptsToLint) {
 	// Create a custom reporter to show Lint Errors nicely formatted
 	var customReporter = map(lintReporter);
 	function lintReporter(file, cb) {
-		if (!file.jshint.success) {
-			var numErrors = file.jshint.results.length;
+		if (!file.eslint.success) {
+			var numErrors = file.eslint.results.length;
 			var errIndex = 1;
 			gutil.log('----------------------------------------');
 			gutil.log(gutil.colors.bgRed('JSHint Error' + (numErrors > 1 ? '(s)' : '') + ': (' + numErrors + ')'));
-			file.jshint.results.forEach(displayError);
+			file.eslint.results.forEach(displayError);
 			gutil.log('----------------------------------------');
 			gutil.beep();
 		}
@@ -147,7 +147,7 @@ function jslinter(scriptsToLint) {
 	}
 
 	var stream = gulp.src(scriptsToLint) 
-		.pipe(jshint())
+		.pipe(eslint())
 		.pipe(customReporter);
 
 	return stream;
