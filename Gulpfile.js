@@ -230,25 +230,33 @@ function spriteSVGs() {
 }
 
 // Webserver and watch
-function startWebserver() {
-	if (isProduction) { return; }
+function startWebserver(options) {
+	var port = gutil.env.port || isHttps ? 8443 : 8000;
+	var isHttps = options && options.https;
 	
+	if (isProduction) { return; }
+
 	var stream = gulp.src(basePaths.dest)
 		.pipe(webserver({
-			livereload: true,
-			directoryListing: true,
-			open: true,
-			port: 8000
+			directoryListing: false,
+			fallback: 'index.html',
+			host: '0.0.0.0',
+			livereload: false,
+			open: false,
+			port: port,
+			https: isHttps
 		}));
 
 	return stream;
 }
+
 
 function watchAndServer(done) {
 	if (isProduction) { return; }
 
 	// Remove this if you do not need webserver to view files locally
 	startWebserver();
+	// startWebserver({https: true}); // Comment this line in if HTTPS is desired
 	
 	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
 	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done
