@@ -34,6 +34,9 @@ var imagemin     = require('gulp-imagemin');
 	var mozjpeg  = require('imagemin-mozjpeg');
 	var svgo     = require('imagemin-svgo');
 
+// SVGs
+var svgSprite = require('gulp-svg-sprite');
+
 // Configuration and environment variables
 
 // use "gulp --prod" to trigger production/build mode from commandline
@@ -100,7 +103,7 @@ function errorHandler(err){
 
 // CSS / Sass compilation
 function styles() {
-	var  stream = gulp.src(appFiles.styles)
+	var stream = gulp.src(appFiles.styles)
 		.pipe(sourcemaps.init())
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
 		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
@@ -200,6 +203,32 @@ function compressImages() {
 	return stream;
 }
 
+// Turn SVG files into SVG Sprite
+function spriteSVGs() {
+    var svgSpriteConfig = {
+            mode: {
+                css: false,
+                symbol: {
+                    dest: imageDestPath
+                }
+            },
+            shape: {
+                dimension: {
+                    precision: -1,
+                },
+                transform: [
+                    {
+                        svgo: {removeViewBox: false}
+                    }
+                ]
+            }
+        };
+
+    return gulp.src(svgPath)
+        .pipe(svgSprite(svgSpriteConfig)).on('error', errorHandler)
+        .pipe(gulp.dest('.'));
+}
+
 // Webserver and watch
 function startWebserver() {
 	if (isProduction) { return; }
@@ -254,6 +283,9 @@ gulp.task('scripts', scripts);
 
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
+
+// Create SVG Sprite
+gulp.task('spriteSVGs', spriteSVGs);
 
 // Webserver/Watch Task(s)
 gulp.task('watch', watchAndServer);

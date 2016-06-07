@@ -25,7 +25,8 @@
     "imagemin-pngquant": "4.1.2",
     "imagemin-svgo": "4.1.2",
     "map-stream": "0.0.6",
-    "merge-stream": "0.1.8"
+    "merge-stream": "0.1.8",
+    "gulp-svg-sprite": "1.2.18"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
