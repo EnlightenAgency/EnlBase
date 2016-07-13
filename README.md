@@ -1,8 +1,8 @@
-#Enl Front End Base Project
+#PD Front End Base Project
 
-The Enlighten Front End Base Project is a sample or starter project for proof of concept and a reference guide for structuring a project's front end code at Enlighten.  It is not set in stone, as things change too fast, and a single base will not fit all projects.  
+The Perficient Digital Front End Base Project is a sample or starter project for proof of concept and a reference guide for structuring a project's front end code at Perficient Digital.  It is not set in stone, as things change too fast, and a single base will not fit all projects.  
 
-**See the [Enlighten Front End Standards](https://github.com/EnlightenAgency/EnlBase/wiki/Enlighten-Front-End-Standards) Wiki for more details.**
+**See the [Perficient Digital Front End Standards](https://github.com/EnlightenAgency/EnlBase/wiki/Enlighten-Front-End-Standards) Wiki for more details.**
 
 ###Recommended File Structure:
 
@@ -29,7 +29,64 @@ The Enlighten Front End Base Project is a sample or starter project for proof of
  - `/bower_components` - if using bower for client packages
  - `/dist` - the compiled version will likely not be source controlled unless using source control for deployment
 
+###Node Versioning
+
+    Last known Working (07/12/2016):
+    	- node: v4.4.7 (LTS)
+    		https://github.com/nodejs/LTS#lts_schedule
+        - npm: 3.10.5
+        	- https://www.npmjs.com/package/npm
+
+    Switch Node Version (using NVM) - "nvm use [version]"  NOTE: If desired node version is not installed, install it using "nvm install [version]"
+	Upgrade/Downgrade NPM - "npm install -g npm@[version]"
+
 ###Installation:
 
  - `npm install` to install the gulp packages via the `package.json` file
  - See the [Gulp Setup](https://github.com/EnlightenAgency/EnlBase/wiki/Gulp-Setup) for information on getting dependencies necessary for building the site.
+
+###Dev Dependency Definitions
+
+	- gulp: A task/build runner that can automate tasks like, CSS and JavaScript minification, file compression, etc.
+		- https://github.com/gulpjs/gulp/tree/master/docs
+	- gulp-autoprefixer: Adds verdor prefixes (-webkit-, -mos-, -ms-) options to CSS properties to help ensure cross-browser compatibility
+		- https://github.com/postcss/autoprefixer
+	- gulp-concat: Files will be concatenated in the order that they are specified in the gulp.src function (eg. return gulp.src(['./lib/file3.js', './lib/file1.js', './lib/file2.js']))
+		- https://github.com/contra/gulp-concat
+	- gulp-eslint: Code linting is used to find problematic patterns or code that doesn’t adhere to certain style guidelines.
+		- https://www.npmjs.com/package/gulp-eslint
+		- http://eslint.org/docs/about/
+	- gulp-filesize: Extension to log filesizes in human readable Strings to the console.
+		- https://github.com/Metrime/gulp-filesize
+	- gulp-imagemin: Compresses GIF, JPEG, PNG, and SVG images
+		- https://www.npmjs.com/package/gulp-imagemin
+	- gulp-livereload: Automatically refreshes browser after saving CSS, image files, etc.
+		- https://www.npmjs.com/package/gulp-livereload
+	- gulp-load-plugins: Loads gulp plugins from package dependencies and attaches them to an object of your choice.
+		- https://www.npmjs.com/package/gulp-load-plugins
+	- gulp-sass: Compiles SASS files into CSS file
+		- https://www.npmjs.com/package/gulp-sass
+	- gulp-sourcemaps: Maps your CSS styles to the correct .scss file instead of the compiled .css in dist. Example: The browswer console will reveal that your body style is coming from global.scss line 28 instead of styles.css line 1064. This makes tracking down your styles for "debugging" much easier.
+		- https://www.npmjs.com/package/gulp-sourcemaps
+	- gulp-svg-sprite: Gulp plugin wrapping around svg-sprite which takes a bunch of SVG files, optimizes them and bakes them into SVG sprites of several types.
+		- https://github.com/jkphl/gulp-svg-sprite
+	- gulp-uglify: Minifies JS files
+		- https://www.npmjs.com/package/gulp-uglify
+	- gulp-util: Utilities for gulp plugins (gutil.log, gutil.replaceExtension)
+		- https://www.npmjs.com/package/gulp-util
+	- gulp-webserver: Gulp plugin to run a local webserver with LiveReload
+		- https://www.npmjs.com/package/gulp-webserver
+	- imagemin-gifsicle: Added options for image optimization - gifs
+		- https://github.com/imagemin/imagemin-gifsicle
+	- imagemin-mozjpeg: Added options for image optimization - jpeg
+		- https://www.npmjs.com/package/mozjpeg
+	- imagemin-optipng:Added options for image optimization - png
+		- https://www.npmjs.com/package/imagemin-optipng
+	- imagemin-pngquant: Added options for image optimization - png
+		- https://www.npmjs.com/package/imagemin-pngquant
+	- imagemin-svgo: Added options for image optimization - svg
+		- https://www.npmjs.com/package/imagemin-svgo
+	- map-stream: Create a through stream from an asyncronous function.
+		- https://www.npmjs.com/package/map-stream
+	- merge-stream: Create a stream that emits events from multiple other streams.
+		- https://www.npmjs.com/package/merge-stream 
