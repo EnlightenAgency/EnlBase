@@ -11,7 +11,6 @@ var gulp         = require('gulp');
 var gutil        = require('gulp-util');
 var webserver    = require('gulp-webserver'); // optional - use for POC or if a webserver is needed for serving project files (i.e. template only)
 var livereload   = require('gulp-livereload'); // livereload browser plugin is also required for this to work
-var filesize     = require('gulp-filesize');
 
 // Styles
 var sass         = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
@@ -20,6 +19,7 @@ var autoprefixer = require('gulp-autoprefixer');
 
 // Scripts
 var concat       = require('gulp-concat');
+var ts           = require('gulp-typescript');
 var uglify       = require('gulp-uglify');
 var eslint       = require('gulp-eslint');
 var map          = require('map-stream');
@@ -71,7 +71,7 @@ var paths = {
 		dest: basePaths.dest + 'js/'
 	},
 	styles: {
-		src: basePaths.src + 'css/' + 'sass/',   // sass is reference for the type of preprocessor, we use the SCSS file format in Sass
+		src: basePaths.src + 'css/' + 'scss/',
 		dest: basePaths.dest + 'css/'
 	}
 };
@@ -85,8 +85,14 @@ var appFiles = {
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
 appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
-appFiles.vendorScripts = [paths.scripts.src + 'vendors/**/*.js']; 
-appFiles.allScripts = [paths.scripts.src + 'vendors/**/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
+appFiles.vendorScripts = [
+	paths.scripts.src + 'vendors/*.js',
+	paths.scripts.src + 'vendors/foundation/foundation.core.js',
+	paths.scripts.src + 'vendors/foundation/foundation.util.mediaQuery.js', // interchange
+	paths.scripts.src + 'vendors/foundation/foundation.util.timerAndImageLoader.js', // interchange
+	paths.scripts.src + 'vendors/foundation/foundation.interchange.js'
+]; 
+appFiles.allScripts = [paths.scripts.src + 'vendors/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
 
 // END Configuration
 
@@ -108,8 +114,7 @@ function styles() {
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
 		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(paths.styles.dest))
-		.pipe(filesize());
+		.pipe(gulp.dest(paths.styles.dest));
 
 	return stream;
 }
@@ -120,7 +125,7 @@ function jslinter(scriptsToLint) {
 	// Create a custom reporter to show Lint Errors nicely formatted
 	var customReporter = map(lintReporter);
 	function lintReporter(file, cb) {
-		if (!file.eslint.success) {
+		if (!file.eslint.success && file.eslint.results) {
 			var numErrors = file.eslint.results.length;
 			var errIndex = 1;
 			gutil.log('----------------------------------------');
@@ -164,19 +169,19 @@ function scripts() {
 	// don't generate map files for vendor files
 	var vendorStream = gulp.src(appFiles.vendorScripts)
 		.pipe(concat(appFiles.vendorScriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
-		.pipe(isProduction ? filesize() : gutil.noop())
+		.pipe(ts({
+			target: 'ES5',
+			allowJs: true
+        }))
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
-		.pipe(gulp.dest(paths.scripts.dest))
-		.pipe(filesize());
+		.pipe(gulp.dest(paths.scripts.dest));
 
 	var userStream = gulp.src(appFiles.userScripts)
 		.pipe(sourcemaps.init())
 		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
-		.pipe(isProduction ? filesize() : gutil.noop())
 		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
 		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(paths.scripts.dest))
-		.pipe(filesize());
+		.pipe(gulp.dest(paths.scripts.dest));
 
 	// See this link for recipe for multiple streams: 
 	// https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md

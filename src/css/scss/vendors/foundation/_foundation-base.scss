@@ -1,0 +1,5 @@
+@import './scss/settings/settings';
+
+@import './scss/foundation';
+
+@include foundation-everything($flex: true);

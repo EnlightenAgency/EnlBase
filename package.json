@@ -1,6 +1,6 @@
 {
   "name": "enl-base",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Example that can be used as a base for setting up projects",
   "main": "Gulpfile.js",
   "repository": "https://github.com/EnlightenAgency/EnlBase.git",
@@ -17,6 +17,7 @@
     "gulp-sass": "2.2.0",
     "gulp-sourcemaps": "1.5.2",
     "gulp-svg-sprite": "1.2.18",
+    "gulp-typescript": "2.13.6",
     "gulp-uglify": "1.2.0",
     "gulp-util": "3.0.6",
     "gulp-webserver": "0.9.1",
@@ -26,7 +27,8 @@
     "imagemin-pngquant": "4.1.2",
     "imagemin-svgo": "4.1.2",
     "map-stream": "0.0.6",
-    "merge-stream": "0.1.8"
+    "merge-stream": "0.1.8",
+    "node-sass": "3.4.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
