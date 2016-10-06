@@ -10,10 +10,14 @@
 var gulp         = require('gulp');
 var gutil        = require('gulp-util');
 var webserver    = require('gulp-webserver'); // optional - use for POC or if a webserver is needed for serving project files (i.e. template only)
+var ssi          = require('ssi'); // for use with adding includes
 var livereload   = require('gulp-livereload'); // livereload browser plugin is also required for this to work
+var runSequence  = require('run-sequence'); // allows you to specify ordering of tasks both synchronous and asynchronously
+var del          = require('del');
 
 // Styles
 var sass         = require('gulp-sass'); // LibSass = faster than Ruby Sass, not quite 100% Sass compliant.  require('gulp-ruby-sass') for Ruby Sass
+var minifyCSS    = require('gulp-clean-css');
 var sourcemaps   = require('gulp-sourcemaps');
 var autoprefixer = require('gulp-autoprefixer');
 
@@ -54,7 +58,7 @@ if (gutil.env.prod) {
 // File reference variables
 var basePaths = {
 	src: 'src/',
-	dest: 'src/'  // current recommendation is to compile files to the same folder
+	dest: 'dest/' 
 };
 
 var paths = {
@@ -64,14 +68,14 @@ var paths = {
 	},
 	images: {
 		src: basePaths.src + 'images/',
-		dest: basePaths.dest
+		dest: basePaths.dest + 'images/'
 	},
 	scripts: {
 		src: basePaths.src + 'js/',
 		dest: basePaths.dest + 'js/'
 	},
 	styles: {
-		src: basePaths.src + 'css/' + 'scss/',
+		src: basePaths.src + 'css/' + 'scss/',  
 		dest: basePaths.dest + 'css/'
 	}
 };
@@ -79,24 +83,35 @@ var paths = {
 var appFiles = {
 	html: paths.html.src +  '**/*.html',
 	images: paths.html.src +  '**/*.{jpg,jpeg,png,gif,svg}',
+	svgs: [paths.images.src + '**/*.svg', '!' + paths.images.src + '**/sprite.symbol.svg'],
 	styles: paths.styles.src + '**/*.scss',
+	css: paths.styles.src + '**/*.css',
+	scripts: paths.scripts.src + '**/*.js',
 	vendorScriptFile: 'vendors.js',
 	scriptFile: 'enlBase.js'
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
-appFiles.userScripts = [paths.scripts.src + '**/*.js', '!' + paths.scripts.src + 'vendors/**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
-appFiles.vendorScripts = [
-	paths.scripts.src + 'vendors/*.js',
-	paths.scripts.src + 'vendors/foundation/foundation.core.js',
-	paths.scripts.src + 'vendors/foundation/foundation.util.mediaQuery.js', // interchange
-	paths.scripts.src + 'vendors/foundation/foundation.util.timerAndImageLoader.js', // interchange
-	paths.scripts.src + 'vendors/foundation/foundation.interchange.js'
+appFiles.siteScripts = [
+	//paths.scripts.src + 'enl.base.js', // suggsted place to setup namespace
+	//paths.scripts.src + 'utils/*.js', // suggsted place to create utils
+	//paths.scripts.src + 'enl.init.js', // suggsted place to setup init process
+	paths.scripts.src + '**/*.js', 
+	'!' + paths.scripts.src + 'vendors/**/*.js', 
+	'!' + paths.scripts.src + appFiles.scriptFile,
+	'!' + paths.scripts.src + appFiles.vendorScriptFile
 ]; 
-appFiles.allScripts = [paths.scripts.src + 'vendors/*.js', paths.scripts.src + '**/*.js', '!' + paths.scripts.src + appFiles.scriptFile]; 
+
+appFiles.vendorScripts = [
+	paths.scripts.src + 'vendors/*.js'
+]; 
 
 // END Configuration
 
-// Standard error handler
+/**
+ * function errorHandler()
+ *
+ * Standard Error Handling
+ */
 function errorHandler(err){
 	gutil.beep();
 	// Log to console
@@ -107,114 +122,124 @@ function errorHandler(err){
 	this.emit('end');
 }
 
-// CSS / Sass compilation
+/**
+ * function styles()
+ *
+ * CSS / Sass compilation
+ */
 function styles() {
-	var stream = gulp.src(appFiles.styles)
-		.pipe(sourcemaps.init())
+	return gulp.src(appFiles.styles)
+		.pipe(!isProduction ? sourcemaps.init() : gutil.noop())
 		.pipe(sass({outputStyle: sassStyle})).on('error', errorHandler)
-		.pipe(autoprefixer({ browsers: ['last 2 versions'], cascade: false })).on('error', errorHandler)
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(paths.styles.dest));
-
-	return stream;
+		.pipe(autoprefixer({ 
+			browsers: ['last 2 versions', '> 1%'], 
+			cascade: false 
+		})).on('error', errorHandler)
+		.pipe(!isProduction ? sourcemaps.write() : gutil.noop())
+		.pipe(isProduction ? minifyCSS() : gutil.noop() )
+		.pipe(gulp.dest(paths.styles.dest))
 }
 
-// JavaScript tasks and compilation
-function jslinter(scriptsToLint) {
-
-	// Create a custom reporter to show Lint Errors nicely formatted
-	var customReporter = map(lintReporter);
-	function lintReporter(file, cb) {
-		if (!file.eslint.success && file.eslint.results) {
-			var numErrors = file.eslint.results.length;
-			var errIndex = 1;
-			gutil.log('----------------------------------------');
-			gutil.log(gutil.colors.bgRed('JSHint Error' + (numErrors > 1 ? '(s)' : '') + ': (' + numErrors + ')'));
-			file.eslint.results.forEach(displayError);
-			gutil.log('----------------------------------------');
-			gutil.beep();
-		}
-		if (typeof cb === 'function') { cb(null, file); }
-
-		function displayError(err) {
-			var filepathparts = file.path.indexOf('/') > -1 ? file.path.split('/') : file.path.split('\\');
-			var filename = filepathparts.length > 1 ? 
-					'.../' + filepathparts[filepathparts.length - 2] + '/' + filepathparts[filepathparts.length - 1] : 
-					file.path;
-			if (err) {
-				gutil.log(' ' + errIndex + ') ' + 
-							gutil.colors.magenta(filename) + ': ' + 
-							gutil.colors.yellow(err.error.line + ':' + err.error.character) + ' - ' + 
-							gutil.colors.blue(err.error.reason));
-			}
-			errIndex++;
-		}
+/**
+ * function jsValidate()
+ *
+ * Lint and stylecheck JavaScript with ESLint
+ * Exclude vendor files
+ * Print results
+ */
+function jsValidate() {
+	if (isProduction) {
+		return;
 	}
 
-	var stream = gulp.src(scriptsToLint) 
+	return gulp.src(appFiles.siteScripts)
 		.pipe(eslint())
-		.pipe(customReporter);
-
-	return stream;
+		.pipe(eslint.format())
+		.pipe(eslint.results(function(results) {
+			if (results.warningCount == 0 && results.errorCount == 0) {
+				gutil.log(gutil.colors.green('Congratulations! No ESLint warnings or errors.'));
+			} else {
+				gutil.beep();
+			}
+		}));
 }
 
-function lintjs() {
-	jslinter(appFiles.userScripts); // don't lint `/vendor` scripts
+/**
+ * function jsSite()
+ *
+ * Init sourcemaps
+ * Concatenate JS files
+ * Write sourcemaps
+ * Uglify / minify (if production)
+ * Save
+ */
+function jsSite() {
+	return gulp.src(appFiles.siteScripts)
+		.pipe(sourcemaps.init())
+		.pipe(concat(appFiles.scriptFile))
+		.pipe(sourcemaps.write())
+		.pipe(isProduction ? uglify() : gutil.noop() )
+		.pipe(gulp.dest(paths.scripts.dest));
 }
 
-function scripts() {
-	// lint JavaScript files, but don't prevent scripts task from continuing
-	lintjs();
-
-	// don't generate map files for vendor files
-	var vendorStream = gulp.src(appFiles.vendorScripts)
+/**
+ * function jsVendor()
+ *
+ * Concatenate JS vendor files / libraries
+ * Uglify / minify
+ * Save
+ */
+function jsVendor() {
+	return gulp.src(appFiles.vendorScripts)
 		.pipe(concat(appFiles.vendorScriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
 		.pipe(ts({
-			target: 'ES5',
-			allowJs: true
+            target: 'ES5',
+            allowJs: true
         }))
-		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
+		.pipe(isProduction ? uglify() : gutil.noop() )	// to unminify vendor in dev, remove "isProduction" ternary
 		.pipe(gulp.dest(paths.scripts.dest));
-
-	var userStream = gulp.src(appFiles.userScripts)
-		.pipe(sourcemaps.init())
-		.pipe(concat(appFiles.scriptFile, {newLine: ';\r\n'})).on('error', errorHandler)
-		.pipe(isProduction ? uglify() : gutil.noop()).on('error', errorHandler)
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(paths.scripts.dest));
-
-	// See this link for recipe for multiple streams: 
-	// https://github.com/gulpjs/gulp/blob/master/docs/recipes/using-multiple-sources-in-one-task.md
-	return merge(vendorStream, userStream);
 }
 
-// Image Minification and compression
-// More info: http://www.devworkflows.com/posts/adding-image-optimization-to-your-gulp-workflow/
-function compressImages() {
-	var stream = gulp.src(appFiles.images)
-		.pipe(imagemin({
-			progressive: true,
-			svgoPlugins: [{removeViewBox: false}],
-			use: [
-				gifsicle({interlaced: true}),
-				optipng({optimizationLevel: 3}),
-				pngquant({quality: '65-80', speed: 4}),
-				mozjpeg({quality: '70'}),
-				svgo()
-			]
-		})).on('error', errorHandler)
+/**
+ * function compressImages()
+ *
+ * Image Minification and compression
+ * More info: http://www.devworkflows.com/posts/adding-image-optimization-to-your-gulp-workflow/
+ */
+function compressImages(done) {
+	 var plugins = [
+        gifsicle({interlaced: true, optimizationLevel: 3}),
+        optipng({optimizationLevel: 3}),
+        pngquant({speed: 3, verbose: false}),
+        svgo({
+        		plugins: [
+	        		{removeViewBox: false}
+	        	]
+        	}),
+        mozjpeg({quality: '85, 95'})
+    ];
+
+    if (!isProduction) {
+        return done();
+    }
+
+	return gulp.src(appFiles.images.src)
+		.pipe(imagemin(plugins, {progressive: true, verbose: false}))
+		.on('error', errorHandler)
 		.pipe(gulp.dest(paths.images.dest));
-
-	return stream;
 }
 
-// Turn SVG files into SVG Sprite
+/**
+ * function spriteSVGs()
+ *
+ * Turn SVG files into SVG Sprite
+ */
 function spriteSVGs() {
     var svgSpriteConfig = {
             mode: {
                 css: false,
                 symbol: {
-                    dest: imageDestPath
+                    dest: paths.images.dest
                 }
             },
             shape: {
@@ -229,19 +254,80 @@ function spriteSVGs() {
             }
         };
 
-    return gulp.src(svgPath)
+    return gulp.src(appFiles.svgs)
         .pipe(svgSprite(svgSpriteConfig)).on('error', errorHandler)
         .pipe(gulp.dest('.'));
 }
 
-// Webserver and watch
+/**
+ * function processSSI()
+ *
+ * compile includes into the html
+ */
+function processSSI() {
+	var inputDirectory = paths.html.src;
+	var outputDirectory = paths.html.dest;
+	var matcher = "/**/*.html";
+
+	var includes = new ssi(inputDirectory, outputDirectory, matcher, true);
+	includes.compile();
+}
+
+
+// Copy files to Dest
+function copyhtml(done) {
+	processSSI();
+	done();
+}
+function copyimg(done) {
+	return compressImages(done);
+}
+function copycss(done) {
+	runSequence('styles', done)
+}
+function copyjs(done) {
+	runSequence(['js:site', 'js:vendor'], done)
+}
+function copy(done) {
+	runSequence('copy:html', 'copy:img', 'copy:css', 'copy:js', done);
+}
+
+var doClean = !gutil.env.noclean;
+
+// Clean
+function cleanhtml(done) {
+	if (doClean) { return del(paths.html.dest + '**/*.html'); }
+	done();
+}
+function cleanimg(done) {
+	if (doClean) { return del(paths.images.dest + '**/*.{jpg,jpeg,png,gif,svg}'); }
+	done();
+}
+function cleancss(done) {
+	if (doClean) { return del(paths.styles.dest + '**/*.css'); }
+	done();
+}
+function cleanjs(done) {
+	if (doClean) { return del(paths.scripts.dest + '**/*.js'); }
+	done();
+}
+function clean(done) {
+	if (doClean) { return del(basePaths.dest); }
+	done();
+}
+
+/**
+ * function startWebserver()
+ *
+ * Webserver and watch
+ */
 function startWebserver(options) {
 	var port = gutil.env.port || isHttps ? 8443 : 8000;
 	var isHttps = options && options.https;
 	
 	if (isProduction) { return; }
 
-	var stream = gulp.src(basePaths.dest)
+	return gulp.src(basePaths.dest)
 		.pipe(webserver({
 			directoryListing: false,
 			fallback: 'index.html',
@@ -251,8 +337,6 @@ function startWebserver(options) {
 			port: port,
 			https: isHttps
 		}));
-
-	return stream;
 }
 
 
@@ -262,16 +346,14 @@ function watchAndServer(done) {
 	// Remove this if you do not need webserver to view files locally
 	startWebserver();
 	// startWebserver({https: true}); // Comment this line in if HTTPS is desired
-	
-	// TODO: Can't watch image files if writing back to the same directory, would create infinite loop
-	// TODO: Need to look into seeing if there is a way to disable the watch, run the task, and re-enable the watch once done
-	// gulp.watch(appFiles.images, compressImages);
 
-	gulp.watch(appFiles.styles, ['styles']);
-	gulp.watch([appFiles.allScripts, 
-				'!' + paths.scripts.src + appFiles.scriptFile,
-				'!' + paths.scripts.src + appFiles.vendorScriptFile
-			   ], ['scripts']);
+	gulp.watch(appFiles.html, ['copy:html']);
+	gulp.watch(appFiles.images, ['copy:img']);
+	gulp.watch(appFiles.svgs, ['spriteSVGs']);
+	gulp.watch(appFiles.styles, ['copy:css']);
+	gulp.watch(appFiles.siteScripts, ['js:site']);
+	gulp.watch(appFiles.vendorScripts, ['js:vendor']);
+	gulp.watch([appFiles.vendorScriptFile, appFiles.scriptFile], ['copy:js']);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
 	if (typeof done === 'function') { done(); }
@@ -283,7 +365,8 @@ function watchAndServer(done) {
 	- Tasks all listed at the bottom for easy scanning, 
 	- Each task references the function that will be called
 	- Task functions should return a stream so Gulp can know when the task is finished
-	    More info: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
+	    
+    More info: https://github.com/gulpjs/gulp/blob/master/docs/API.md#async-task-support
 
 *********************/
 
@@ -291,14 +374,27 @@ function watchAndServer(done) {
 gulp.task('styles', styles);
 
 // Script Task(s)
-gulp.task('lintjs', lintjs);
-gulp.task('scripts', scripts);
+gulp.task('js:validate', jsValidate);
+gulp.task('js:site', jsSite);
+gulp.task('js:vendor', jsVendor);
 
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
-
-// Create SVG Sprite
 gulp.task('spriteSVGs', spriteSVGs);
+
+// Copy Task(s)
+gulp.task('copy:html', ['clean:html'], copyhtml);
+gulp.task('copy:img', ['clean:img'], copyimg);
+gulp.task('copy:css', ['clean:css'], copycss);
+gulp.task('copy:js', ['clean:js'], copyjs);
+gulp.task('copy', copy);
+
+// Clean Task(s)
+gulp.task('clean:html', cleanhtml);
+gulp.task('clean:img', cleanimg);
+gulp.task('clean:css', cleancss);
+gulp.task('clean:js', cleanjs);
+gulp.task('clean', clean);
 
 // Webserver/Watch Task(s)
 gulp.task('watch', watchAndServer);
@@ -306,8 +402,25 @@ gulp.task('watch', watchAndServer);
 // Default task
 // by default it will run the dev process. 
 // Use "gulp --prod" to build for production
-gulp.task('default', ['styles', 'scripts', 'watch']);
+gulp.task('default', defaultTask);
 
 // Build task, skips the watch, 
 // same can be accomplished with gulp --prod
-gulp.task('build', ['styles', 'scripts']);
+gulp.task('build', buildTask);
+
+function defaultTask(done) {
+	runSequence('clean',
+		['js:validate', 'js:site', 'js:vendor', 'styles'],
+		'copy',
+		'spriteSVGs',
+		'watch',
+		done);
+}
+
+function buildTask(done) {
+	runSequence('clean',
+		['js:validate', 'js:site', 'js:vendor', 'styles'],
+		'copy',
+		'spriteSVGs',
+		done);
+}
