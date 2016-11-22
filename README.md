@@ -32,7 +32,7 @@ The Perficient Digital Front End Base Project is a sample or starter project for
 ###Node Versioning
 
     Last known Working (07/12/2016):
-    	- node: v4.4.7 (LTS)
+    	- node: v6.9.1 (LTS)
     		https://github.com/nodejs/LTS#lts_schedule
         - npm: 3.10.5
         	- https://www.npmjs.com/package/npm
