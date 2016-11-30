@@ -236,7 +236,7 @@ function compressImages(done) {
 	return gulp.src(appFiles.images)
 		.pipe(imagemin(plugins, {progressive: true, verbose: false}))
 		.on('error', errorHandler)
-		.pipe(gulp.dest(paths.images.dest));
+		.pipe(gulp.dest(paths.html.dest));
 }
 
 /**
