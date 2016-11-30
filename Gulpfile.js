@@ -87,22 +87,26 @@ var appFiles = {
 	styles: paths.styles.src + '**/*.scss',
 	css: paths.styles.src + '**/*.css',
 	scripts: paths.scripts.src + '**/*.js',
+	files: paths.html.src + '**/*.{woff,ttf,otf,eot}',
 	vendorScriptFile: 'vendors.js',
-	scriptFile: 'enlBase.js'
+	scriptFile: 'ENL.scripts.js'
 };
 // Generally `/vendors` needs to be loaded first, exclude the built file(s)
 appFiles.siteScripts = [
-	//paths.scripts.src + 'enl.base.js', // suggsted place to setup namespace
-	//paths.scripts.src + 'utils/*.js', // suggsted place to create utils
-	//paths.scripts.src + 'enl.init.js', // suggsted place to setup init process
-	paths.scripts.src + '**/*.js', 
+	paths.scripts.src + 'ENL.base.js', // suggsted place to setup namespace
+	paths.scripts.src + 'utils/**/*.js', // suggsted place to create utils
+	paths.scripts.src + 'components/**/*.js', // suggsted place to create components
+	paths.scripts.src + 'pages/**/*.js', // suggsted place to create pages
+	paths.scripts.src + 'ENL.init.js', // suggsted place to setup init process
 	'!' + paths.scripts.src + 'vendors/**/*.js', 
 	'!' + paths.scripts.src + appFiles.scriptFile,
 	'!' + paths.scripts.src + appFiles.vendorScriptFile
 ]; 
 
 appFiles.vendorScripts = [
-	paths.scripts.src + 'vendors/*.js'
+	paths.scripts.src + 'vendors/*.js',
+	'!' + paths.scripts.src + appFiles.scriptFile,
+	'!' + paths.scripts.src + appFiles.vendorScriptFile
 ]; 
 
 // END Configuration
@@ -200,6 +204,11 @@ function jsVendor() {
 		.pipe(gulp.dest(paths.scripts.dest));
 }
 
+function filesSite(){
+	return gulp.src(appFiles.files)
+		.pipe(gulp.dest(paths.html.dest));
+}
+
 /**
  * function compressImages()
  *
@@ -220,13 +229,14 @@ function compressImages(done) {
     ];
 
     if (!isProduction) {
-        return done();
+		return gulp.src(appFiles.images)
+			.pipe(gulp.dest(paths.html.dest));
     }
 
-	return gulp.src(appFiles.images.src)
+	return gulp.src(appFiles.images)
 		.pipe(imagemin(plugins, {progressive: true, verbose: false}))
 		.on('error', errorHandler)
-		.pipe(gulp.dest(paths.images.dest));
+		.pipe(gulp.dest(paths.html.dest));
 }
 
 /**
@@ -288,8 +298,11 @@ function copycss(done) {
 function copyjs(done) {
 	runSequence(['js:site', 'js:vendor'], done)
 }
+function copyfiles(done) {
+	runSequence(['files:site'], done);
+}
 function copy(done) {
-	runSequence('copy:html', 'copy:img', 'copy:css', 'copy:js', done);
+	runSequence('copy:html', 'copy:img', 'copy:css', 'copy:js', 'copy:files', done);
 }
 
 var doClean = !gutil.env.noclean;
@@ -353,6 +366,7 @@ function watchAndServer(done) {
 	gulp.watch(appFiles.styles, ['copy:css']);
 	gulp.watch(appFiles.siteScripts, ['js:site']);
 	gulp.watch(appFiles.vendorScripts, ['js:vendor']);
+	gulp.watch(appFiles.files, ['copy:files']);
 	gulp.watch([appFiles.vendorScriptFile, appFiles.scriptFile], ['copy:js']);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
@@ -378,6 +392,9 @@ gulp.task('js:validate', jsValidate);
 gulp.task('js:site', jsSite);
 gulp.task('js:vendor', jsVendor);
 
+//Files Task
+gulp.task('files:site', filesSite);
+
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
 gulp.task('spriteSVGs', spriteSVGs);
@@ -387,6 +404,7 @@ gulp.task('copy:html', ['clean:html'], copyhtml);
 gulp.task('copy:img', ['clean:img'], copyimg);
 gulp.task('copy:css', ['clean:css'], copycss);
 gulp.task('copy:js', ['clean:js'], copyjs);
+gulp.task('copy:files', copyfiles);
 gulp.task('copy', copy);
 
 // Clean Task(s)
