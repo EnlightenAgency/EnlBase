@@ -87,6 +87,7 @@ var appFiles = {
 	styles: paths.styles.src + '**/*.scss',
 	css: paths.styles.src + '**/*.css',
 	scripts: paths.scripts.src + '**/*.js',
+	files: paths.html.src + '**/*.{woff,ttf,otf,eot}',
 	vendorScriptFile: 'vendors.js',
 	scriptFile: 'ENL.scripts.js'
 };
@@ -209,6 +210,11 @@ function jsVendor() {
 		.pipe(gulp.dest(paths.scripts.dest));
 }
 
+function filesSite(){
+	return gulp.src(appFiles.files)
+		.pipe(gulp.dest(paths.html.dest));
+}
+
 /**
  * function compressImages()
  *
@@ -298,8 +304,11 @@ function copycss(done) {
 function copyjs(done) {
 	runSequence(['js:site', 'js:vendor'], done);
 }
+function copyfiles(done) {
+	runSequence(['files:site'], done);
+}
 function copy(done) {
-	runSequence('copy:html', 'copy:img', 'copy:css', 'copy:js', done);
+	runSequence('copy:html', 'copy:img', 'copy:css', 'copy:js', 'copy:files', done);
 }
 
 var doClean = !gutil.env.noclean;
@@ -363,6 +372,7 @@ function watchAndServer(done) {
 	gulp.watch(appFiles.styles, ['copy:css']);
 	gulp.watch(appFiles.siteScripts, ['js:site']);
 	gulp.watch(appFiles.vendorScripts, ['js:vendor']);
+	gulp.watch(appFiles.files, ['copy:files']);
 	gulp.watch([appFiles.vendorScriptFile, appFiles.scriptFile], ['copy:js']);
 
 	// return a callback function to signify the task has finished running (the watches will continue to run)
@@ -388,6 +398,9 @@ gulp.task('js:validate', jsValidate);
 gulp.task('js:site', jsSite);
 gulp.task('js:vendor', jsVendor);
 
+//Files Task
+gulp.task('files:site', filesSite);
+
 // Image Compression Task(s)
 gulp.task('imagemin', compressImages);
 gulp.task('spriteSVGs', spriteSVGs);
@@ -397,6 +410,7 @@ gulp.task('copy:html', ['clean:html'], copyhtml);
 gulp.task('copy:img', ['clean:img'], copyimg);
 gulp.task('copy:css', ['clean:css'], copycss);
 gulp.task('copy:js', ['clean:js'], copyjs);
+gulp.task('copy:files', copyfiles);
 gulp.task('copy', copy);
 
 // Clean Task(s)
