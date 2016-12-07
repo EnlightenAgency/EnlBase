@@ -14,6 +14,16 @@ The Perficient Digital Front End Base Project is a sample or starter project for
     |-Docs - documentation or information files
     |-Tests - unit tests
 
+###Quick Start
+1. Download base project git repo
+2. Run `npm install`
+3. Rename all namespaced files `ENL.base.js`, `ENL.init.js`, `ENL.styles.scss`; changing the namespace to the project's new namespace (i.e. `THF.styles.scss`, `UDR.base.js`, `UMA.init.js`, etc.)
+4. Change all references to namespaced files throughout project, particularly `Gulpfile.js` and `index.html`
+5. Change the namespaced root object in JavaScript (defined in `index.html`, set in `ENL.base.js`, and referenced in `ENL.init.js`; it may also be extended in other files such as components, pages, or utils)
+6. Run `gulp`
+7. ...
+8. Profit
+
 ###Files that belong in the root:
 
  - `.git` (or other source control)
@@ -31,7 +41,7 @@ The Perficient Digital Front End Base Project is a sample or starter project for
 
 ###Node Versioning
 
-    Last known Working (07/12/2016):
+    Last known Working (11/22/2016):
     	- node: v6.9.1 (LTS)
     		https://github.com/nodejs/LTS#lts_schedule
         - npm: 3.10.5
