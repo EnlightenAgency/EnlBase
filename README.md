@@ -41,17 +41,17 @@ The Perficient Digital Front End Base Project is a sample or starter project for
 
 ###Node Versioning
 
-    Last known Working (11/22/2016):
-    	- node: v6.9.1 (LTS)
+    Last known Working (2/13/2018):
+    	- node: v8.9.4 (LTS)
     		https://github.com/nodejs/LTS#lts_schedule
-        - npm: 3.10.5
+        - npm: v5.6.0
         	- https://www.npmjs.com/package/npm
 
     Switch Node Version (using NVM) - "nvm use [version]"  NOTE: If desired node version is not installed, install it using "nvm install [version]"
 	Upgrade/Downgrade NPM - "npm install -g npm@[version]"
 
 ###Installation:
-
+ - `npm install gulp@latest -g`
  - `npm install` to install the gulp packages via the `package.json` file
  - See the [Gulp Setup](https://github.com/EnlightenAgency/EnlBase/wiki/Gulp-Setup) for information on getting dependencies necessary for building the site.
 
