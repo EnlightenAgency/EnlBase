@@ -47,11 +47,26 @@ module.exports = {
 	},
 	module: {
 		rules: [
-			/*{ //Enable for Typescript
+			/*{
+				test: /\.ts$/,
+				enforce: 'pre',
+				loader: 'tslint-loader',
+				options: {}
+			}
+			{ //Enable for Typescript
 				test: /\.tsx?$/,
 				use: 'ts-loader',
 				exclude: /node_modules/
-			},*/ 
+			},*/
+			{
+				enforce: "pre",
+				test: /\.js$/,
+				exclude: [/node_modules/,/vendors/],
+				loader: "eslint-loader",
+				options: {
+				
+				}
+			},
 			{
 				test: /\.css$/,
 				use: [
