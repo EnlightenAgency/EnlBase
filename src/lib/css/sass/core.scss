@@ -1,0 +1,85 @@
+﻿@import "base/reset";
+@import "pages/about";
+@import "pages/contact";
+@import "pages/game";
+@import "pages/home";
+@import "pages/portfolio";
+@import "ui_components/footer";
+@import "ui_components/header";
+@import "ui_components/move";
+@import "ui_components/sidenav";
+
+html, body {
+	height: 100%;
+	width: 100%;
+	font-size: 16px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+	background: #E8F5E9;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	color: #f1f1f1;
+	min-height: 72em;
+}
+
+li a {
+	color: #1B5E20;
+}
+
+h1 {
+	font-size: 1.75em;
+}
+
+h2 {
+	font-size: 1.5em;
+}
+
+h3 {
+	font-size: 1.25em;
+}
+
+.panel {
+	margin-top: 10px;
+	background: #1B5E20;
+	padding: 1em;
+
+	p, ul {
+		color: #f1f1f1;
+		padding: 1em 0;
+	}
+
+	h1, h2, h3 {
+		color: #f1f1f1;
+		font-weight: bold;
+		padding: 0 1em 0 0;
+	}
+
+	h1 {
+		font-size: 2em;
+	}
+
+	h2 {
+		font-size: 1.5em;
+	}
+
+	h3 {
+		font-size: 1.25em;
+	}
+}
+
+.active {
+	background: rgba(0,0,0,.25);
+}
+
+.layout-view {
+	height: 52em;
+}
+
+.noMP {
+	margin: 0;
+	padding: 0;
+}

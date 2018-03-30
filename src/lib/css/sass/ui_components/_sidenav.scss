@@ -1,0 +1,19 @@
+﻿.side-nav {
+    display: flex;
+    flex-flow: column;
+    background: #66BB6A no-repeat;
+	height:100%;
+    ul{
+        margin-top:1em;
+    }
+    li {
+        border-bottom:1px solid #333;      
+        margin: 0 1em;
+    }
+
+    h3 {
+        margin-left: 1.9em;
+        font-size: 1.2em;
+        color: #fff;
+    }
+}

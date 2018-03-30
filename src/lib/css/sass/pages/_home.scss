@@ -1,0 +1,25 @@
+﻿.home {
+    margin: 10px;
+
+    .map-container {
+        width: 99%;
+        position: absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+        overflow: hidden;
+    }
+    .map-canvas-container{
+        height:50em;
+    }
+    .content {
+        background: #4CAF50 no-repeat;
+        padding: 5px;
+        height: 50em;
+    }
+
+    h2 {
+        color: #f1f1f1;
+    }
+}
