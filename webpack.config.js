@@ -27,14 +27,21 @@ module.exports = {
 	},
 	entry: {
 		scripts: ['./src/js/ENL.init.js', './src/js/ENL.base.js'],
-		vendors: glob.sync("./src/js/vendors/**/*.js")
+		vendors: glob.sync("./src/js/vendors/**/*.js"),
+		ts: ['./src/ts/ENL.index.ts']
 	},
+	devtool: 'inline-source-map',
 	output: {
 		filename: './js/[name].bundle.js',
 		path: path.resolve(__dirname, 'dest')
 	},
 	module: {
 		rules: [
+			{
+				test: /\.tsx?$/,
+				use: 'ts-loader',
+				exclude: /node_modules/
+			},
 			{
 				test: /\.css$/,
 				use: [
@@ -77,6 +84,9 @@ module.exports = {
 				]
 			}
 		]
+	},
+	resolve: {
+		extensions: ['.tsx', '.ts', '.js']
 	},
 	plugins: [
 		new CleanWebpackPlugin(['dest']),
