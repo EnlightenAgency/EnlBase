@@ -32,8 +32,12 @@ module.exports = {
 		}
 	},
 	entry: {
-		scripts: ['./src/js/ENL.init.js', './src/js/ENL.base.js'],
-		vendors: glob.sync("./src/js/vendors/**/*.js"),
+		scripts: [
+			'./src/js/ENL.init.js',
+			'./src/js/ENL.base.js'
+		],
+		vendors:glob.sync("./src/js/vendors/**/*.js"),
+		foundation:glob.sync('./node_modules/foundation-sites/js/**/*.js'),
 		//ts: ['./src/ts/ENL.index.ts'] //Enable for Typscript
 	},
 	devtool: 'inline-source-map',

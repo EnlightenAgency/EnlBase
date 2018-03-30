@@ -4,6 +4,7 @@
 	"description": "Example that can be used as a base for setting up projects",
 	"repository": "https://github.com/EnlightenAgency/EnlBase.git",
 	"dependencies": {
+		"foundation-sites": "^6.4.4-rc1",
 		"npm": "^5.8.0"
 	},
 	"devDependencies": {
