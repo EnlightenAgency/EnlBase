@@ -1,3 +1,5 @@
+import '../css/scss/ENL.styles.scss';
+
 (function () {
 	ENL = ENL || {};
 	ENL.utils = ENL.utils || {};

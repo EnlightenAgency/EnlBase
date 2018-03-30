@@ -1,0 +1,12 @@
+removed gulp references from package.json
+
+Updated to node latest stable 8.11.1
+npm install webpack webpack-cli style-loader css-loader sass-loader node-sass mini-css-extract-plugin  uglifyjs-webpack-plugin copy-webpack-plugin webpack-serve file-loader image-webpack-loader html-loader  clean-webpack-plugin --save-dev
+
+added "build": "webpack --config webpack.config.js" to "scripts" in package.json
+added "start": "webpack --config ./webpack.config.js && webpack-serve --config ./webpack.config.js --port 1337", to "scripts" in package.json
+added "run": "webpack --config ./webpack.config.js --watch" to "scripts" in package.json
+
+npm run build -- runs webpack to build files
+npm run start -- starts dev server at port 1337, will rebuild on file changes
+npm run dev -- build and start watch task

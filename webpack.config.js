@@ -3,6 +3,7 @@ var glob = require("glob");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
 	optimization: {
@@ -44,14 +45,41 @@ module.exports = {
 			{
 				test: /\.scss$/,
 				use: [
-				MiniCssExtractPlugin.loader,
-				'css-loader',
-				'sass-loader'
+					MiniCssExtractPlugin.loader,
+					'css-loader',
+					'sass-loader'
+				]
+			},
+			{
+				test: /\.(png|svg|jpg|gif)$/,
+				use: [
+					'file-loader',
+					{
+						loader: 'image-webpack-loader',
+						options: {
+							bypassOnDebug: true,
+						},
+					},
+				]
+			},
+			{
+				test: /\.(html)$/,
+				use: [
+					'file-loader?name=[path][name].[ext]',
+					'extract-loader',
+					'html-loader'
+					/*options: {
+						attrs: [':data-src'],
+						//minimize: true,
+						//removeComments: false,
+						//collapseWhitespace: false
+					}*/
 				]
 			}
 		]
 	},
 	plugins: [
+		new CleanWebpackPlugin(['dest']),
 		new MiniCssExtractPlugin({
 			filename: "./css/[name].bundle.css",
 		}),

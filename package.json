@@ -2,16 +2,19 @@
 	"name": "enl-base",
 	"version": "0.0.2",
 	"description": "Example that can be used as a base for setting up projects",
-	"main": "Gulpfile.js",
 	"repository": "https://github.com/EnlightenAgency/EnlBase.git",
 	"dependencies": {
 		"npm": "^5.8.0"
 	},
 	"devDependencies": {
+		"clean-webpack-plugin": "^0.1.19",
 		"copy-webpack-plugin": "^4.5.1",
 		"css-loader": "^0.28.11",
 		"del": "^3.0.0",
 		"extract-text-webpack-plugin": "^4.0.0-alpha.0",
+		"file-loader": "^1.1.11",
+		"html-loader": "^0.5.5",
+		"image-webpack-loader": "^4.2.0",
 		"mini-css-extract-plugin": "^0.4.0",
 		"node-sass": "^4.8.3",
 		"sass-loader": "^6.0.7",
