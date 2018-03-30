@@ -1,9 +1,13 @@
 const path = require('path');
+var glob = require("glob");
 
 module.exports = {
-	entry: ['./src/js/ENL.init.js', './src/js/ENL.base.js'],
+	entry: {
+		scripts: ['./src/js/ENL.init.js', './src/js/ENL.base.js'],
+		vendors: glob.sync("./src/js/vendors/**/*.js")
+	},
 	output: {
-		filename: 'ENL.scripts.js',
+		filename: '[name].bundle.js',
 		path: path.resolve(__dirname, 'dest/js')
 	}
 };
