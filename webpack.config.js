@@ -1,5 +1,5 @@
 const path = require('path');
-var glob = require("glob");
+const glob = require("glob");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -11,7 +11,7 @@ module.exports = {
 			new UglifyJsPlugin({
 				cache: true,
 				parallel: true,
-				sourceMap: true // set to true if you want JS source maps
+				sourceMap: true
 			})
 		],
 		splitChunks: {
@@ -21,6 +21,12 @@ module.exports = {
 					test: /\.scss$/,
 					chunks: 'all',
 					enforce: true
+				},
+				vendors: {
+					name: 'vendors',
+					test: /\.js$/,
+					chunks: 'all',
+					enforce: true
 				}
 			}
 		}
@@ -28,7 +34,7 @@ module.exports = {
 	entry: {
 		scripts: ['./src/js/ENL.init.js', './src/js/ENL.base.js'],
 		vendors: glob.sync("./src/js/vendors/**/*.js"),
-		ts: ['./src/ts/ENL.index.ts']
+		//ts: ['./src/ts/ENL.index.ts'] //Enable for Typscript
 	},
 	devtool: 'inline-source-map',
 	output: {
@@ -37,11 +43,11 @@ module.exports = {
 	},
 	module: {
 		rules: [
-			{
+			/*{ //Enable for Typescript
 				test: /\.tsx?$/,
 				use: 'ts-loader',
 				exclude: /node_modules/
-			},
+			},*/ 
 			{
 				test: /\.css$/,
 				use: [
@@ -75,18 +81,12 @@ module.exports = {
 					'file-loader?name=[path][name].[ext]',
 					'extract-loader',
 					'html-loader'
-					/*options: {
-						attrs: [':data-src'],
-						//minimize: true,
-						//removeComments: false,
-						//collapseWhitespace: false
-					}*/
 				]
 			}
 		]
 	},
 	resolve: {
-		extensions: ['.tsx', '.ts', '.js']
+		//extensions: ['.tsx', '.ts', '.js'] //Enable for Typescript
 	},
 	plugins: [
 		new CleanWebpackPlugin(['dest']),
@@ -95,6 +95,6 @@ module.exports = {
 		}),
 		new CopyWebpackPlugin([
 			{ from: './src/index.html', to: 'index.html' }
-		])
+		]),
 	]
 };
